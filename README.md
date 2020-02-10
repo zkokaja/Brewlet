@@ -3,9 +3,11 @@
 Brewlet
 </h1>
 
-<img src="images/release-badge.svg" alt="Release Version 1.0"/>
+<a href="https://github.com/zkokaja/Brewlet/releases/tag/v1.0">
+  <img src="images/release-badge.svg" alt="Release Version 1.0"/>
+</a>
 
-The missing menulet for brew.sh.
+The missing menulet for [brew.sh].
 
 This menulet makes it easier to work with [brew.sh]. For example, you need to
 manually check if some of your packages can be updated. With Brewlet it's easy:
@@ -19,6 +21,13 @@ background, so you don't have to.
 
 <img src="images/statusmenu-example.png" width="300px"/>
 
+
+## Installation
+
+Download the latest version from 
+[releases](https://github.com/zkokaja/Brewlet/releases/latest)
+or direct link
+[here (zip)](https://github.com/zkokaja/Brewlet/releases/latest/download/Brewlet.zip).
 
 ## On the horizon
 
