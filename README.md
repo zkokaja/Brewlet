@@ -1,13 +1,14 @@
 <h1>
-<img src="images/brewlet-color.svg" alt="BrewLet Icon" width="64" />
+<img src="images/brewlet-color.svg" alt="BrewLet Icon" width="64px" />
 Brewlet
-<p style="display: inline; font-size:14px;"> - The missing menulet for brew.sh</p>
 </h1>
 
 <img src="images/release-badge.svg" alt="Release Version 1.0"/>
 
+The missing menulet for brew.sh.
+
 This menulet makes it easier to work with [brew.sh]. For example, you need to
-manually check if some of your packages can be updated. In Brewlet it's easy:
+manually check if some of your packages can be updated. With Brewlet it's easy:
 if everything is working swimmingly, then you'll see the normal shadow 
 <img src="images/brewlet-black.svg" width="16px" /> 
 icon. If updates are available to be installed, the icon will become colored,
