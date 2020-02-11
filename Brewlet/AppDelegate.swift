@@ -106,18 +106,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         run_command(arguments: ["outdated"]) { (_, output: String) in
             let n_lines = output.split(separator: "\n").count
+            let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
             let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
-            
+
             var iconName = ""
-            
             if n_lines > 0 {
                 statusItem.title = "\(n_lines) Outdated Packages"
                 iconName = "BrewletIcon-Color"
+                updateItem.isHidden = false
             } else {
                 statusItem.title = "Packages are up-to-date"
                 iconName = "BrewletIcon-Black"
+                updateItem.isHidden = true
             }
-            
+
             // Update UI in main thread
             DispatchQueue.main.async {
                 self.statusItem.button?.image = NSImage(named: iconName)

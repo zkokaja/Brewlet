@@ -12,7 +12,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="BrewLet" customModuleProvider="target">
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Brewlet" customModuleProvider="target">
             <connections>
                 <outlet property="statusMenu" destination="NHW-zJ-Uiw" id="4Z1-Fl-WHZ"/>
             </connections>
@@ -23,7 +23,7 @@
                 <menuItem title="Checking..." tag="1" enabled="NO" toolTip="Count the number of installed formulae that have an updated version available." id="Kpo-2q-cbk">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="Update and Upgrade" tag="2" toolTip="Fetch the newest version of Homebrew and all formulae from GitHub, and upgrade  outdated formulae." id="R04-4l-Fp2">
+                <menuItem title="Update and Upgrade" tag="2" hidden="YES" toolTip="Fetch the newest version of Homebrew and all formulae from GitHub, and upgrade  outdated formulae." id="R04-4l-Fp2">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="update_upgradeWithSender:" target="Voe-Tx-rLC" id="eNW-DL-GJ9"/>
@@ -61,7 +61,7 @@
                 </menuItem>
             </items>
             <accessibility help="Brewlet"/>
-            <point key="canvasLocation" x="-583" y="93"/>
+            <point key="canvasLocation" x="-739" y="65"/>
         </menu>
     </objects>
 </document>
