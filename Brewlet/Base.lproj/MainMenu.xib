@@ -53,8 +53,7 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="UQP-uE-Rhp"/>
-                <menuItem title="Quit" tag="8" id="wbo-2b-aTx">
-                    <modifierMask key="keyEquivalentModifierMask"/>
+                <menuItem title="Quit" tag="8" keyEquivalent="q" id="wbo-2b-aTx">
                     <connections>
                         <action selector="quitClickedWithSender:" target="Voe-Tx-rLC" id="LiH-aR-vHs"/>
                     </connections>
