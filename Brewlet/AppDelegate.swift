@@ -34,6 +34,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupTimers()
     }
     
+    func animateIcon() -> Timer {
+        var frame = 0
+        let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { (_) in
+            self.statusItem.button?.image = NSImage(named: "Brewlet-Filled-\(frame)")
+            frame = (frame + 1) % 7
+        }
+        
+        return animation
+    }
+    
     func setupTimers() {
         let hourly : TimeInterval = 60 * 60
         let daily : TimeInterval = hourly * 24
@@ -62,11 +72,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @IBAction func update_upgrade(sender: NSMenuItem) {
+        
+        let animation = self.animateIcon()
+        
         run_command(arguments: ["update"], outputHandler: { (_,_) in
             os_log("Updated brew.", type: .info)
             
             self.run_command(arguments: ["upgrade"], outputHandler: { (Process,String) in
                 os_log("Upgraded packages.", type: .info)
+                
+                animation.invalidate()
                 
                 self.check_outdated()
                 self.update_info()
