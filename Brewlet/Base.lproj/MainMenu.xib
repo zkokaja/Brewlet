@@ -29,17 +29,13 @@
                         <action selector="update_upgradeWithSender:" target="Voe-Tx-rLC" id="eNW-DL-GJ9"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="hWv-01-uF2"/>
-                <menuItem title="Info" tag="3" enabled="NO" toolTip="Display brief statistics for your Homebrew installation." id="j23-vG-Pr4">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                </menuItem>
+                <menuItem isSeparatorItem="YES" id="qEj-Er-ubf"/>
                 <menuItem title="Clean up" tag="4" toolTip="Remove stale lock files and outdated downloads for all formulae and casks, and remove old versions of installed formulae." id="5ba-uR-xp6">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="cleanupWithSender:" target="Voe-Tx-rLC" id="w4P-cv-vaJ"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="qEj-Er-ubf"/>
                 <menuItem title="Export List" tag="5" toolTip="Export all installed formulae to a file in your Downloads folder." id="efH-iu-XU3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -53,14 +49,18 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="UQP-uE-Rhp"/>
-                <menuItem title="Quit" tag="8" keyEquivalent="q" id="wbo-2b-aTx">
+                <menuItem title="Info" tag="3" enabled="NO" toolTip="Brief statistics for your Homebrew installation." id="j23-vG-Pr4">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Quit" tag="8" id="wbo-2b-aTx">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="quitClickedWithSender:" target="Voe-Tx-rLC" id="LiH-aR-vHs"/>
                     </connections>
                 </menuItem>
             </items>
             <accessibility help="Brewlet"/>
-            <point key="canvasLocation" x="-739" y="65"/>
+            <point key="canvasLocation" x="-739" y="75"/>
         </menu>
     </objects>
 </document>
