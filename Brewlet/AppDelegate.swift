@@ -7,6 +7,7 @@
 
 import Cocoa
 import OSLog
+import UserNotifications
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -27,6 +28,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.toolTip = "Brewlet"
         statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
         
+        // Request user access if needed
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { _, error in
+            if error != nil {
+                os_log("Notification permission error: %s", type: .error, error.debugDescription)
+            }
+        }
+                
         // Run initial tasks to set status
         check_outdated()
         update_info()
@@ -131,6 +140,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 statusItem.title = "\(n_lines) Outdated Packages"
                 iconName = "BrewletIcon-Color"
                 updateItem.isHidden = false
+                self.sendNotification(title: "Updates Available",
+                                      body: "Some of your packages can be updated.")
             } else {
                 statusItem.title = "Packages are up-to-date"
                 iconName = "BrewletIcon-Black"
@@ -163,7 +174,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 try output.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
                 os_log("Saved file in downloads folder.", type: .info)
             } catch {
-                os_log("Unexpected error: %s", type: .error, "\(error)")
+                os_log("Unexpected error: %s", type: .error, error.localizedDescription)
+                self.sendNotification(title: "Unexpected Error",
+                                      body: "An unexpected error occurred. See log for details.")
             }
         }
     }
@@ -199,6 +212,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         catch {
             os_log("Unexpected error: %s", type: .error, "\(error)")
+            self.sendNotification(title: "Unexpected Error",
+                                  body: "An unexpected error occurred. See log for details.")
+        }
+    }
+    
+    func sendNotification(title: String, body: String, timeInterval: TimeInterval = 1) {
+        
+        
+        
+        // Create the notification content
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = UNNotificationSound.default
+        
+        // Set up the time trigger
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval,
+                                                        repeats: false)
+        
+        // Create the request
+        let uuidString = UUID().uuidString
+        let request = UNNotificationRequest(identifier: uuidString,
+                                            content: content,
+                                            trigger: trigger)
+
+        // Schedule the request with the system
+        let notificationCenter = UNUserNotificationCenter.current()
+        notificationCenter.add(request) { error in
+           if error != nil {
+            os_log("Notification request error: %s", type: .error, error.debugDescription)
+           }
         }
     }
     
