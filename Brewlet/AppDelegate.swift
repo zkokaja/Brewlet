@@ -75,17 +75,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let animation = self.animateIcon()
         
+        let tmpFile = self.getTemporaryFile(withName: "brewlet-upgrade.log")
+        
         run_command(arguments: ["update"], outputHandler: { (_,_) in
             os_log("Updated brew.", type: .info)
             
-            self.run_command(arguments: ["upgrade"], outputHandler: { (Process,String) in
+            self.run_command(arguments: ["upgrade"], stdOut: tmpFile) { (_,_) in
                 os_log("Upgraded packages.", type: .info)
                 
                 animation.invalidate()
                 
                 self.check_outdated()
                 self.update_info()
-            })
+            }
         })
     }
     
@@ -166,21 +168,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func run_command(arguments: [String], outputHandler: @escaping (Process,String) -> Void) {
+    func run_command(arguments: [String],
+                     stdOut: Any? = Pipe(),
+                     outputHandler: @escaping (Process,String) -> Void) {
         let task = Process()
         task.launchPath = "/bin/bash"
         task.arguments = ["/usr/local/Homebrew/bin/brew"] + arguments
-        task.standardOutput = Pipe()
+        task.standardOutput = stdOut
         task.terminationHandler = { (process: Process) in
+            var output = ""
+            
             if let stdout = process.standardOutput as? Pipe {
                 let outputData = stdout.fileHandleForReading.readDataToEndOfFile()
-                let output = String(decoding: outputData, as: UTF8.self)
-                
-                outputHandler(process, output)
+                output = String(decoding: outputData, as: UTF8.self)
+            }
+            else if let stdout = process.standardOutput as? FileHandle {
+                stdout.closeFile()
             }
             else {
-                os_log("Standard out is not a pipe.", type: .info)
+                os_log("Standard out type is unknown.", type: .error)
             }
+            
+            // Handle the output of the command
+            outputHandler(process, output)
         }
         
         // Run it asynch
@@ -192,6 +202,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    func getTemporaryFile(withName: String) -> FileHandle? {
+        let paths = FileManager.default.temporaryDirectory
+        let fileName = paths.appendingPathComponent(withName)
+        let success = FileManager.default.createFile(atPath: fileName.path, contents: nil, attributes: nil)
+        
+        if success {
+            os_log("Opened: %s", type: .info, fileName.path)
+            return FileHandle.init(forWritingAtPath: fileName.path)
+        }
+        else {
+            os_log("Unable to create file: %s", type: .error, "\(fileName.path)")
+            return nil
+        }
+    }
     
     // Quit any running process and application
     @IBAction func quitClicked(sender: NSMenuItem) {
