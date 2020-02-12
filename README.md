@@ -16,7 +16,7 @@ if everything is working swimmingly, then you'll see the normal shadow
 icon. If updates are available to be installed, the icon will become colored,
 <img src="images/brewlet-color.svg" width="16px" /> , to get your attention –
 along with a notification if you wish.
-Once clicked, you'll be able to take upgrade your packages, among other options.
+Once clicked, you'll be able to upgrade your packages, among other options.
 In addition, Brewlet will periodically check the status of packages in the
 background, so you don't have to.
 
