@@ -29,6 +29,10 @@
                         <action selector="update_upgradeWithSender:" target="Voe-Tx-rLC" id="eNW-DL-GJ9"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Packages" tag="4" hidden="YES" id="UOg-cC-wep">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Packages" id="SxN-qY-H1K"/>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="qEj-Er-ubf"/>
                 <menuItem title="Clean up" tag="4" toolTip="Remove stale lock files and outdated downloads for all formulae and casks, and remove old versions of installed formulae." id="5ba-uR-xp6">
                     <modifierMask key="keyEquivalentModifierMask"/>

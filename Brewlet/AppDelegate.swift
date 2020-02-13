@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let name2tag = ["outdated":  1,
                     "update": 2,
                     "info": 3,
+                    "packages": 4,
                     "analytics": 6]
     
     @IBOutlet weak var statusMenu: NSMenu!
@@ -35,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 os_log("Notification permission error: %s", type: .error, error.debugDescription)
             }
         }
-                
+        
         // Run initial tasks to set status
         check_outdated()
         update_info()
@@ -130,30 +131,68 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let statusItem = self.statusMenu.item(withTag: 0)!
         statusItem.title = "Checking..."
         
-        run_command(arguments: ["outdated"]) { (_, output: String) in
-            let n_lines = output.split(separator: "\n").count
+        run_command(arguments: ["outdated", "-v"]) { (_, output: String) in
+            let packages = output.split(separator: "\n")
+            let n_lines = packages.count
             let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
             let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
-
+            let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
+            packageItem.submenu?.removeAllItems()
+            
             var iconName = ""
             if n_lines > 0 {
                 statusItem.title = "\(n_lines) Outdated Packages"
                 iconName = "BrewletIcon-Color"
                 updateItem.isHidden = false
+                packageItem.isHidden = false
+                self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: packages)
                 self.sendNotification(title: "Updates Available",
                                       body: "Some of your packages can be updated.")
             } else {
                 statusItem.title = "Packages are up-to-date"
                 iconName = "BrewletIcon-Black"
                 updateItem.isHidden = true
+                packageItem.isHidden = true
             }
 
-            // Update UI in main thread
+            // Update icon in main thread
             DispatchQueue.main.async {
                 self.statusItem.button?.image = NSImage(named: iconName)
             }
             
             os_log("Checked outdated status.", type: .info)
+        }
+    }
+    
+    func fillPackageMenu(packageMenu : NSMenu, packages: [String.SubSequence]) {
+        for package in packages {
+            let item = NSMenuItem.init(title: String(package),
+                                       action: #selector(AppDelegate.upgradePackage),
+                                       keyEquivalent: "")
+            packageMenu.addItem(item)
+        }
+    }
+    
+    @objc func upgradePackage(_ sender: NSMenuItem) {
+        let animation = self.animateIcon()
+        let packageName = String(sender.title.split(separator: " ")[0])
+        let tmpFile = self.getTemporaryFile(withName: "brewlet-package-upgrade.log")
+        
+        run_command(arguments: ["upgrade", packageName], stdOut: tmpFile) { (_,_) in
+            os_log("Upgraded package: %s.", type: .info, packageName)
+            
+            animation.invalidate()
+            sender.menu?.removeItem(sender)
+            
+            // Update statuses
+            let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
+            if let n_packages = Int(statusItem.title.split(separator: " ")[0]) {
+                if n_packages > 1 {
+                    statusItem.title = "\(n_packages - 1) Outdated Packages"
+                } else {
+                    self.check_outdated()
+                }
+            }
         }
     }
     
@@ -218,8 +257,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func sendNotification(title: String, body: String, timeInterval: TimeInterval = 1) {
-        
-        
         
         // Create the notification content
         let content = UNMutableNotificationContent()
