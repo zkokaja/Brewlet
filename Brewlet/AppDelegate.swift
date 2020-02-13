@@ -13,6 +13,7 @@ import UserNotifications
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     var timers : [Timer] = []
+    var updatesAvailable = false
     let name2tag = ["outdated":  1,
                     "update": 2,
                     "info": 3,
@@ -38,7 +39,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         // Run initial tasks to set status
-        check_outdated()
+        update_upgrade(sender: nil)
         update_info()
         update_analytics(sender: statusMenu.item(withTag: name2tag["analytics"]!)!)
         setupTimers()
@@ -60,7 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Check for updates hourly
         timers.append(Timer.scheduledTimer(withTimeInterval: hourly, repeats: true) { (Timer) in
-            self.check_outdated()
+            self.update_upgrade(sender: nil)
         })
         
         // Update info hourly
@@ -81,24 +82,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         })
     }
     
-    @IBAction func update_upgrade(sender: NSMenuItem) {
+    @IBAction func update_upgrade(sender: NSMenuItem?) {
+        let animation = animateIcon()
+        let command = updatesAvailable && sender != nil ? "upgrade" : "update"
+        let tmpFile = getTemporaryFile(withName: "brewlet-upgrade.log")
         
-        let animation = self.animateIcon()
-        
-        let tmpFile = self.getTemporaryFile(withName: "brewlet-upgrade.log")
-        
-        run_command(arguments: ["update"], outputHandler: { (_,_) in
-            os_log("Updated brew.", type: .info)
+        self.run_command(arguments: [command], stdOut: tmpFile) { (_,_) in
+            os_log("Ran %s command.", type: .info, command)
             
-            self.run_command(arguments: ["upgrade"], stdOut: tmpFile) { (_,_) in
-                os_log("Upgraded packages.", type: .info)
-                
-                animation.invalidate()
-                
-                self.check_outdated()
-                self.update_info()
-            }
-        })
+            animation.invalidate()
+            self.check_outdated()
+        }
     }
     
     @IBAction func toggle_analytics(sender: NSMenuItem) {
@@ -128,7 +122,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func check_outdated() {
-        let statusItem = self.statusMenu.item(withTag: 0)!
+        let statusItem = statusMenu.item(withTag: 0)!
         statusItem.title = "Checking..."
         
         run_command(arguments: ["outdated", "-v"]) { (_, output: String) in
@@ -140,18 +134,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             packageItem.submenu?.removeAllItems()
             
             var iconName = ""
-            if n_lines > 0 {
+            self.updatesAvailable = n_lines > 0
+            if self.updatesAvailable {
                 statusItem.title = "\(n_lines) Outdated Packages"
                 iconName = "BrewletIcon-Color"
-                updateItem.isHidden = false
+                updateItem.title = "Upgrade"
                 packageItem.isHidden = false
+                self.updatesAvailable = true
                 self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: packages)
                 self.sendNotification(title: "Updates Available",
-                                      body: "Some of your packages can be updated.")
+                                      body: "Some packages can be upgraded.")
             } else {
                 statusItem.title = "Packages are up-to-date"
                 iconName = "BrewletIcon-Black"
-                updateItem.isHidden = true
+                self.updatesAvailable = false
+                updateItem.title = "Update"
                 packageItem.isHidden = true
             }
 
@@ -189,6 +186,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let n_packages = Int(statusItem.title.split(separator: " ")[0]) {
                 if n_packages > 1 {
                     statusItem.title = "\(n_packages - 1) Outdated Packages"
+                    DispatchQueue.main.async {
+                        self.statusItem.button?.image = NSImage(named: "BrewletIcon-Color")
+                    }
                 } else {
                     self.check_outdated()
                 }

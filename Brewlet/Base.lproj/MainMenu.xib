@@ -23,7 +23,7 @@
                 <menuItem title="Checking..." tag="1" enabled="NO" toolTip="Count the number of installed formulae that have an updated version available." id="Kpo-2q-cbk">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="Update and Upgrade" tag="2" hidden="YES" toolTip="Fetch the newest version of Homebrew and all formulae from GitHub, and upgrade  outdated formulae." id="R04-4l-Fp2">
+                <menuItem title="Update" tag="2" toolTip="Fetch the newest version of Homebrew and all formulae from GitHub, and upgrade outdated formulae." id="R04-4l-Fp2">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="update_upgradeWithSender:" target="Voe-Tx-rLC" id="eNW-DL-GJ9"/>
@@ -40,13 +40,13 @@
                         <action selector="cleanupWithSender:" target="Voe-Tx-rLC" id="w4P-cv-vaJ"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Export List" tag="5" toolTip="Export all installed formulae to a file in your Downloads folder." id="efH-iu-XU3">
+                <menuItem title="Export list" tag="5" toolTip="Export all installed formulae to a file in your Downloads folder." id="efH-iu-XU3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="export_listWithSender:" target="Voe-Tx-rLC" id="mc2-8s-kXb"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Updating Analytics..." tag="6" enabled="NO" toolTip="Toggle Homebrew's analytics on or off respectively." id="wMo-5U-HDC">
+                <menuItem title="Updating analytics..." tag="6" enabled="NO" toolTip="Toggle Homebrew's analytics on or off respectively." id="wMo-5U-HDC">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="toggle_analyticsWithSender:" target="Voe-Tx-rLC" id="hqt-hQ-aKu"/>
@@ -64,7 +64,7 @@
                 </menuItem>
             </items>
             <accessibility help="Brewlet"/>
-            <point key="canvasLocation" x="-739" y="75"/>
+            <point key="canvasLocation" x="-1293" y="69"/>
         </menu>
     </objects>
 </document>
