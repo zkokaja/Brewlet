@@ -3,8 +3,8 @@
 Brewlet
 </h1>
 
-<a href="https://github.com/zkokaja/Brewlet/releases/tag/v1.1">
-  <img src="images/release-badge.svg" alt="Release Version 1.1"/>
+<a href="https://github.com/zkokaja/Brewlet/releases/tag/v1.2">
+  <img src="images/release-badge.svg" alt="Release Version 1.2"/>
 </a>
 
 The missing menulet for [brew.sh].
