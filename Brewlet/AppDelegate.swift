@@ -29,7 +29,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = statusMenu
         statusItem.button?.toolTip = "Brewlet"
         statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
-        
+        statusItem.button?.image?.isTemplate = true
+
         // Request user access if needed
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { _, error in
@@ -49,6 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var frame = 0
         let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { (_) in
             self.statusItem.button?.image = NSImage(named: "Brewlet-Filled-\(frame)")
+            self.statusItem.button?.image?.isTemplate = true
             frame = (frame + 1) % 7
         }
         
@@ -155,6 +157,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // Update icon in main thread
             DispatchQueue.main.async {
                 self.statusItem.button?.image = NSImage(named: iconName)
+                self.statusItem.button?.image?.isTemplate = true
             }
             
             os_log("Checked outdated status.", type: .info)
@@ -188,6 +191,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     statusItem.title = "\(n_packages - 1) Outdated Packages"
                     DispatchQueue.main.async {
                         self.statusItem.button?.image = NSImage(named: "BrewletIcon-Color")
+                        self.statusItem.button?.image?.isTemplate = true
                     }
                 } else {
                     self.check_outdated()
