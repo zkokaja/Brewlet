@@ -136,6 +136,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             packageItem.submenu?.removeAllItems()
             
             var iconName = ""
+            let previousUpdatesAvailable = self.updatesAvailable
             self.updatesAvailable = n_lines > 0
             if self.updatesAvailable {
                 statusItem.title = "\(n_lines) Outdated Packages"
@@ -144,8 +145,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 packageItem.isHidden = false
                 self.updatesAvailable = true
                 self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: packages)
-                self.sendNotification(title: "Updates Available",
-                                      body: "Some packages can be upgraded.")
+                // Only notify end-user when transitioning from having no updates to updates
+                if !previousUpdatesAvailable {
+                    self.sendNotification(title: "Updates Available",
+                                          body: "Some packages can be upgraded.")
+                }
             } else {
                 statusItem.title = "Packages are up-to-date"
                 iconName = "BrewletIcon-Black"
