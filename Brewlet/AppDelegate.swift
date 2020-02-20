@@ -13,7 +13,7 @@ import UserNotifications
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     var timers : [Timer] = []
-    var updatesAvailable = false
+    var outdatedPackageCount = 0
     let name2tag = ["outdated":  1,
                     "update": 2,
                     "info": 3,
@@ -86,7 +86,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBAction func update_upgrade(sender: NSMenuItem?) {
         let animation = animateIcon()
-        let command = updatesAvailable && sender != nil ? "upgrade" : "update"
+        let command = (outdatedPackageCount > 0) && sender != nil ? "upgrade" : "update"
         let tmpFile = getTemporaryFile(withName: "brewlet-upgrade.log")
         
         self.run_command(arguments: [command], stdOut: tmpFile) { (_,_) in
@@ -136,20 +136,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             packageItem.submenu?.removeAllItems()
             
             var iconName = ""
-            self.updatesAvailable = n_lines > 0
-            if self.updatesAvailable {
+            let previousOutdatedPackageCount = self.outdatedPackageCount
+            self.outdatedPackageCount = n_lines
+            if self.outdatedPackageCount > 0 {
                 statusItem.title = "\(n_lines) Outdated Packages"
                 iconName = "BrewletIcon-Color"
                 updateItem.title = "Upgrade"
                 packageItem.isHidden = false
-                self.updatesAvailable = true
                 self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: packages)
-                self.sendNotification(title: "Updates Available",
-                                      body: "Some packages can be upgraded.")
+                // Only notify end-user when transitioning from having no updates to updates
+                if previousOutdatedPackageCount != self.outdatedPackageCount {
+                    self.sendNotification(title: "Updates Available",
+                                          body: "Some packages can be upgraded.")
+                }
             } else {
                 statusItem.title = "Packages are up-to-date"
                 iconName = "BrewletIcon-Black"
-                self.updatesAvailable = false
                 updateItem.title = "Update"
                 packageItem.isHidden = true
             }
