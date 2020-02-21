@@ -54,17 +54,18 @@ the metadata related to packages. From the `man` pages:
 Whereas `upgrade` will actually upgrade your outdated packages to the latest
 version(s).
 
-> Upgrade  outdated,  unpinned formulae using the same options they were originally installed with, plus any appended brew formula options.
+> Upgrade outdated, unpinned formulae using the same options they were originally installed with, plus any appended brew formula options.
 
 ## Developer
 
 Contributions are welcome!
 
-You can look for logged messages and errors with the Console app, or this command
-(replacing with your PID of course):
+You can look for logged messages and errors with the Console app, 
+or this command:
 
 ```bash
-$ log show --predicate 'processID == 6259' --info
+$ log show --predicate 'process == "Brewlet"' --info
+$ log show --predicate "processID == `pgrep Brewlet`" --info --last 1h
 ```
 
 To test for outdated packages, reinstall some older versions from a specific
@@ -83,6 +84,13 @@ $ inkscape --export-type="png" \
            --export-file brewlet-"$len".png \
            -w "$len" \
            brewlet.svg
+```
+
+Brew will redirect output of the `upgrade` command to a temporary file, you can
+use this command to locate it.
+
+```bash
+$ find /var/folders -type f -name 'brewlet*log' 2> /dev/null
 ```
 
 ## License & Acknowledgements
