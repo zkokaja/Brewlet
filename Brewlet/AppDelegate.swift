@@ -12,8 +12,8 @@ import UserNotifications
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    var timers : [Timer] = []
-    var outdatedPackageCount = 0
+    var timers: [Timer] = []
+    var packages: [Package] = []
     let name2tag = ["outdated":  1,
                     "update": 2,
                     "info": 3,
@@ -47,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func animateIcon() -> Timer {
         var frame = 0
-        let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { (_) in
+        let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
             self.statusItem.button?.image = NSImage(named: "Brewlet-Filled-\(frame)")
             self.statusItem.button?.image?.isTemplate = true
             frame = (frame + 1) % 7
@@ -85,10 +85,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBAction func update_upgrade(sender: NSMenuItem?) {
         let animation = animateIcon()
-        let command = (outdatedPackageCount > 0) && sender != nil ? "upgrade" : "update"
+        let isOutdated = self.packages.filter{$0.outdated && $0.installed_on_request}.count > 0
+        let command = isOutdated && sender != nil ? "upgrade" : "update"
         let tmpFile = getTemporaryFile(withName: "brewlet-upgrade.log")
         
-        self.run_command(arguments: [command], stdOut: tmpFile) { (_,_) in
+        self.run_command(arguments: [command], fileRedirect: tmpFile) { _,_ in
             os_log("Ran %s command.", type: .info, command)
             
             animation.invalidate()
@@ -108,9 +109,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         sender.isEnabled = false
         sender.title = "Updating analytics..."
         
-        run_command(arguments: ["analytics", "state"],
-                    outputHandler: { (Process, output: String) in
-            
+        run_command(arguments: ["analytics", "state"]) { (_, data: Data) in
+            let output = String(decoding: data, as: UTF8.self)
             if output.lowercased().contains("disabled") {
                 sender.title = "Toggle analytics on"
             } else {
@@ -119,32 +119,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             sender.isEnabled = true
             os_log("Updated analytics.", type: .info)
-        })
+        }
     }
     
     func check_outdated() {
         let statusItem = statusMenu.item(withTag: 0)!
         statusItem.title = "Checking..."
         
-        run_command(arguments: ["outdated", "-v"]) { (_, output: String) in
-            let packages = output.split(separator: "\n")
-            let n_lines = packages.count
+        run_command(arguments: ["info", "--json", "--installed"]) { (_, data: Data) in
+            
+            let previousOutdatedPackageCount = self.packages.filter{ $0.outdated && $0.installed_on_request }.count
+            
+            do {
+                self.packages = try packagesFromJson(jsonData: data)
+            } catch {
+                os_log("Unexpected error: %s", type: .error, "\(error)")
+                self.sendNotification(title: "Unexpected Error",
+                                      body: "An unexpected error occurred. See log for details.")
+                return
+            }
+            
+            var iconName = ""
             let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
             let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
             let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
             packageItem.submenu?.removeAllItems()
             
-            var iconName = ""
-            let previousOutdatedPackageCount = self.outdatedPackageCount
-            self.outdatedPackageCount = n_lines
-            if self.outdatedPackageCount > 0 {
-                statusItem.title = "\(n_lines) Outdated Packages"
+            let outdatedPackages = self.packages.filter{ $0.outdated && $0.installed_on_request }
+            let outdatedPackageCount = outdatedPackages.count
+            if outdatedPackageCount > 0 {
+                statusItem.title = "\(outdatedPackageCount) Outdated Packages"
                 iconName = "BrewletIcon-Color"
                 updateItem.title = "Upgrade"
                 packageItem.isHidden = false
-                self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: packages)
+                self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: outdatedPackages)
+                
                 // Only notify end-user when transitioning from having no updates to updates
-                if previousOutdatedPackageCount != self.outdatedPackageCount {
+                if previousOutdatedPackageCount != outdatedPackageCount {
                     self.sendNotification(title: "Updates Available",
                                           body: "Some packages can be upgraded.")
                 }
@@ -164,9 +175,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func fillPackageMenu(packageMenu : NSMenu, packages: [String.SubSequence]) {
+    func fillPackageMenu(packageMenu : NSMenu, packages: [Package]) {
         for package in packages {
-            let item = NSMenuItem.init(title: String(package),
+            let newVersion = package.versions.stable
+            let currentVersion = package.getInstalledVersion() ?? "?"
+            let title = "\(package.name) (\(currentVersion)) <  \(newVersion)"
+            
+            let item = NSMenuItem.init(title: title,
                                        action: #selector(AppDelegate.upgradePackage),
                                        keyEquivalent: "")
             packageMenu.addItem(item)
@@ -178,7 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let packageName = String(sender.title.split(separator: " ")[0])
         let tmpFile = self.getTemporaryFile(withName: "brewlet-package-upgrade.log")
         
-        run_command(arguments: ["upgrade", packageName], stdOut: tmpFile) { (_,_) in
+        run_command(arguments: ["upgrade", packageName], fileRedirect: tmpFile) { _,_ in
             os_log("Upgraded package: %s.", type: .info, packageName)
             
             animation.invalidate()
@@ -191,7 +206,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     statusItem.title = "\(n_packages - 1) Outdated Packages"
                     DispatchQueue.main.async {
                         self.statusItem.button?.image = NSImage(named: "BrewletIcon-Color")
-//                        self.statusItem.button?.image?.isTemplate = true
                     }
                 } else {
                     self.check_outdated()
@@ -201,7 +215,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func update_info() {
-        run_command(arguments: ["info"]) { (_, info: String) in
+        run_command(arguments: ["info"]) { (_, data: Data) in
+            let info = String(decoding: data, as: UTF8.self)
             let statusItem = self.statusMenu.item(withTag: self.name2tag["info"]!)!
             statusItem.title = info
             os_log("Updated info.", type: .info)
@@ -209,11 +224,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @IBAction func export_list(sender: NSMenuItem) {
-        run_command(arguments: ["list", "-1"]) { (_, output: String) in
+        run_command(arguments: ["list", "-1"]) { (_, data: Data) in
             let paths = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
             let filename = paths.appendingPathComponent("brew-packages.txt")
 
             do {
+                let output = String(decoding: data, as: UTF8.self)
                 try output.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
                 os_log("Saved file in downloads folder.", type: .info)
             } catch {
@@ -225,18 +241,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func run_command(arguments: [String],
-                     stdOut: Any? = Pipe(),
-                     outputHandler: @escaping (Process,String) -> Void) {
+                     fileRedirect: FileHandle? = nil,
+                     outputHandler: @escaping (Process,Data) -> Void) {
         let task = Process()
         task.launchPath = "/bin/bash"
         task.arguments = ["/usr/local/Homebrew/bin/brew"] + arguments
-        task.standardOutput = stdOut
+        
+        let pipe = Pipe()
+        var allData = Data() // What happens to the scope of this variable when used inside the closure??
+        pipe.fileHandleForReading.readabilityHandler = { fh in
+            let data = fh.availableData
+            allData.append(data)
+        }
+        task.standardOutput = fileRedirect != nil ? fileRedirect : pipe
+        
         task.terminationHandler = { (process: Process) in
-            var output = ""
-            
             if let stdout = process.standardOutput as? Pipe {
-                let outputData = stdout.fileHandleForReading.readDataToEndOfFile()
-                output = String(decoding: outputData, as: UTF8.self)
+                allData.append(stdout.fileHandleForReading.readDataToEndOfFile())
             }
             else if let stdout = process.standardOutput as? FileHandle {
                 stdout.closeFile()
@@ -246,7 +267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             // Handle the output of the command
-            outputHandler(process, output)
+            outputHandler(process, allData)
         }
         
         // Run it asynch

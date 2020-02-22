@@ -10,6 +10,7 @@
 		BBC6CAB123EF476B00189F94 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC6CAB023EF476B00189F94 /* AppDelegate.swift */; };
 		BBC6CAB323EF476C00189F94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBC6CAB223EF476C00189F94 /* Assets.xcassets */; };
 		BBC6CAB623EF476C00189F94 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBC6CAB423EF476C00189F94 /* MainMenu.xib */; };
+		BBED83622400E6B500B4ADA8 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBED83612400E6B500B4ADA8 /* Package.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		BBC6CAB523EF476C00189F94 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		BBC6CAB723EF476C00189F94 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BBC6CAB823EF476C00189F94 /* BrewLet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrewLet.entitlements; sourceTree = "<group>"; };
+		BBED83612400E6B500B4ADA8 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				BBC6CAB023EF476B00189F94 /* AppDelegate.swift */,
+				BBED83612400E6B500B4ADA8 /* Package.swift */,
 				BBC6CAB223EF476C00189F94 /* Assets.xcassets */,
 				BBC6CAB423EF476C00189F94 /* MainMenu.xib */,
 				BBC6CAB723EF476C00189F94 /* Info.plist */,
@@ -130,6 +133,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBED83622400E6B500B4ADA8 /* Package.swift in Sources */,
 				BBC6CAB123EF476B00189F94 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
