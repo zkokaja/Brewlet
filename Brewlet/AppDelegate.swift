@@ -52,17 +52,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         setupTimers()
     }
     
-    func animateIcon() -> Timer {
-        var frame = 0
-        let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
-            self.statusItem.button?.image = NSImage(named: "Brewlet-Filled-\(frame)")
-            self.statusItem.button?.image?.isTemplate = true
-            frame = (frame + 1) % 7
-        }
-        
-        return animation
-    }
-    
     func setupTimers() {
         // Cancel the existing timer
         timer?.invalidate()
@@ -87,6 +76,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         
         os_log("Scheduled a timer with a period of %f seconds", type: .info, period)
     }
+    
+    // MARK: - Actions
     
     @IBAction func cleanup(sender: NSMenuItem) {
         run_command(arguments: ["cleanup"], outputHandler: { (_,_) in
@@ -116,6 +107,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let command = sender.title.contains("on") ? "on" : "off"
         run_command(arguments: ["analytics", command]) { (_,_) in
             self.update_analytics(sender: sender)
+        }
+    }
+    
+    @IBAction func export_list(sender: NSMenuItem) {
+        run_command(arguments: ["list", "-1"]) { (_, data: Data) in
+            let paths = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
+            let filename = paths.appendingPathComponent("brew-packages.txt")
+
+            do {
+                let output = String(decoding: data, as: UTF8.self)
+                try output.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
+                os_log("Saved file in downloads folder.", type: .info)
+            } catch {
+                os_log("Unexpected error: %s", type: .error, error.localizedDescription)
+                self.sendNotification(title: "Unexpected Error",
+                                      body: "An unexpected error occurred. See log for details.")
+            }
         }
     }
     
@@ -245,22 +253,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
-    @IBAction func export_list(sender: NSMenuItem) {
-        run_command(arguments: ["list", "-1"]) { (_, data: Data) in
-            let paths = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
-            let filename = paths.appendingPathComponent("brew-packages.txt")
-
-            do {
-                let output = String(decoding: data, as: UTF8.self)
-                try output.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
-                os_log("Saved file in downloads folder.", type: .info)
-            } catch {
-                os_log("Unexpected error: %s", type: .error, error.localizedDescription)
-                self.sendNotification(title: "Unexpected Error",
-                                      body: "An unexpected error occurred. See log for details.")
-            }
-        }
-    }
+    // MARK: - Helper functions
     
     func run_command(arguments: [String],
                      fileRedirect: FileHandle? = nil,
@@ -301,6 +294,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             self.sendNotification(title: "Unexpected Error",
                                   body: "An unexpected error occurred. See log for details.")
         }
+    }
+    
+    func animateIcon() -> Timer {
+        var frame = 0
+        let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
+            self.statusItem.button?.image = NSImage(named: "Brewlet-Filled-\(frame)")
+            self.statusItem.button?.image?.isTemplate = true
+            frame = (frame + 1) % 7
+        }
+        
+        return animation
     }
     
     func sendNotification(title: String, body: String, timeInterval: TimeInterval = 1) {
@@ -354,6 +358,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         return dateFormatter.string(from: date)
     }
     
+    // MARK: - Preferences functions
+    
     @IBAction func openPreferences(_ sender: NSMenuItem) {
         preferencesWindow.showWindow(sender)
     }
@@ -370,6 +376,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         userDefaults.setValue(period, forKey: "updateInterval")
         self.setupTimers()
     }
+    
+    // MARK: - Termination functions
     
     // Quit any running process and application
     @IBAction func quitClicked(sender: NSMenuItem) {
