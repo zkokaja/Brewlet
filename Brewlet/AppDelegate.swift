@@ -107,6 +107,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             animation.invalidate()
             self.check_outdated()
         }
+        
+        let dateStr = formatDate()
+        statusItem.button?.toolTip = "Brewlet. Last updated \(dateStr)"
     }
     
     @IBAction func toggle_analytics(sender: NSMenuItem) {
@@ -340,6 +343,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             os_log("Unable to create file: %s", type: .error, "\(fileName.path)")
             return nil
         }
+    }
+        
+    func formatDate(date: Date = Date()) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .medium
+        dateFormatter.locale = Locale.current
+        dateFormatter.doesRelativeDateFormatting = true
+        return dateFormatter.string(from: date)
     }
     
     @IBAction func openPreferences(_ sender: NSMenuItem) {
