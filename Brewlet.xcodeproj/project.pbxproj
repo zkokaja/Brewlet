@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB95C6F024030F1B00995E0A /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB95C6EE24030F1B00995E0A /* PreferencesController.swift */; };
+		BB95C6F124030F1B00995E0A /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB95C6EF24030F1B00995E0A /* PreferencesController.xib */; };
 		BBC6CAB123EF476B00189F94 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC6CAB023EF476B00189F94 /* AppDelegate.swift */; };
 		BBC6CAB323EF476C00189F94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBC6CAB223EF476C00189F94 /* Assets.xcassets */; };
 		BBC6CAB623EF476C00189F94 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBC6CAB423EF476C00189F94 /* MainMenu.xib */; };
@@ -14,6 +16,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BB95C6EE24030F1B00995E0A /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
+		BB95C6EF24030F1B00995E0A /* PreferencesController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesController.xib; sourceTree = "<group>"; };
 		BBC6CAAD23EF476B00189F94 /* Brewlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Brewlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBC6CAB023EF476B00189F94 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BBC6CAB223EF476C00189F94 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -57,6 +61,8 @@
 				BBED83612400E6B500B4ADA8 /* Package.swift */,
 				BBC6CAB223EF476C00189F94 /* Assets.xcassets */,
 				BBC6CAB423EF476C00189F94 /* MainMenu.xib */,
+				BB95C6EE24030F1B00995E0A /* PreferencesController.swift */,
+				BB95C6EF24030F1B00995E0A /* PreferencesController.xib */,
 				BBC6CAB723EF476C00189F94 /* Info.plist */,
 				BBC6CAB823EF476C00189F94 /* BrewLet.entitlements */,
 			);
@@ -121,6 +127,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB95C6F124030F1B00995E0A /* PreferencesController.xib in Resources */,
 				BBC6CAB323EF476C00189F94 /* Assets.xcassets in Resources */,
 				BBC6CAB623EF476C00189F94 /* MainMenu.xib in Resources */,
 			);
@@ -133,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB95C6F024030F1B00995E0A /* PreferencesController.swift in Sources */,
 				BBED83622400E6B500B4ADA8 /* Package.swift in Sources */,
 				BBC6CAB123EF476B00189F94 /* AppDelegate.swift in Sources */,
 			);

@@ -56,6 +56,12 @@
                 <menuItem title="Info" tag="3" enabled="NO" toolTip="Brief statistics for your Homebrew installation." id="j23-vG-Pr4">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
+                <menuItem title="Preferences..." id="hSu-Do-G6x">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openPreferences:" target="Voe-Tx-rLC" id="Ubd-eM-7rL"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Quit" tag="8" id="wbo-2b-aTx">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -64,7 +70,7 @@
                 </menuItem>
             </items>
             <accessibility help="Brewlet"/>
-            <point key="canvasLocation" x="-1382" y="17"/>
+            <point key="canvasLocation" x="-1555.5" y="-131"/>
         </menu>
     </objects>
 </document>

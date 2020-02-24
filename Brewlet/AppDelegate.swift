@@ -10,9 +10,9 @@ import OSLog
 import UserNotifications
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
 
-    var timers: [Timer] = []
+    var timer: Timer?
     var packages: [Package] = []
     let name2tag = ["outdated":  1,
                     "update": 2,
@@ -21,7 +21,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     "analytics": 6]
     
     @IBOutlet weak var statusMenu: NSMenu!
-    let statusItem : NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    let userDefaults = UserDefaults.standard
+    let statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    
+    var preferencesWindow: PreferencesController!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         
@@ -30,6 +33,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.toolTip = "Brewlet"
         statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
 
+        // Set up preferences window
+        preferencesWindow = PreferencesController()
+        preferencesWindow.delegate = self
+        
         // Request user access if needed
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { _, error in
@@ -57,23 +64,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func setupTimers() {
-        let hourly : TimeInterval = 60 * 60
-        let daily : TimeInterval = hourly * 24
+        // Cancel the existing timer
+        timer?.invalidate()
+        timer = nil
         
-        // Check for updates hourly
-        timers.append(Timer.scheduledTimer(withTimeInterval: hourly, repeats: true) { (Timer) in
+        // Determine how often to run the jobs (if at all)
+        var period = userDefaults.double(forKey: "updateInterval")
+        if period == -1 {
+            return
+        }
+        else if period == 0 {
+            period = TimeInterval(3600)
+            userDefaults.set(period, forKey: "updateInterval")
+        }
+        
+        // Start a new timer
+        timer = Timer.scheduledTimer(withTimeInterval: period, repeats: true) { _ in
             self.update_upgrade(sender: nil)
-        })
-        
-        // Update info hourly
-        timers.append(Timer.scheduledTimer(withTimeInterval: hourly, repeats: true) { (Timer) in
             self.update_info()
-        })
-        
-        // Update analytics daily
-        timers.append(Timer.scheduledTimer(withTimeInterval: daily, repeats: true) { (Timer) in
             self.update_analytics(sender: self.statusMenu.item(withTag: self.name2tag["analytics"]!)!)
-        })        
+        }
+        
+        os_log("Scheduled a timer with a period of %f seconds", type: .info, period)
     }
     
     @IBAction func cleanup(sender: NSMenuItem) {
@@ -128,7 +140,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         run_command(arguments: ["info", "--json", "--installed"]) { (_, data: Data) in
             
-            let previousOutdatedPackageCount = self.packages.filter{ $0.outdated && $0.installed_on_request }.count
+            // Determine which packages to include
+            let includeDependencies = self.userDefaults.bool(forKey: "includeDependencies")
+            let criterion: (Package) -> Bool = includeDependencies
+                ? { $0.outdated }
+                : { $0.outdated && $0.installed_on_request }
+            
+            
+            let previousOutdatedPackageCount = self.packages.filter(criterion).count
             
             do {
                 self.packages = try packagesFromJson(jsonData: data)
@@ -145,7 +164,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
             packageItem.submenu?.removeAllItems()
             
-            let outdatedPackages = self.packages.filter{ $0.outdated && $0.installed_on_request }
+            let outdatedPackages = self.packages.filter(criterion)
             let outdatedPackageCount = outdatedPackages.count
             if outdatedPackageCount > 0 {
                 statusItem.title = "\(outdatedPackageCount) Outdated Packages"
@@ -323,6 +342,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    @IBAction func openPreferences(_ sender: NSMenuItem) {
+        preferencesWindow.showWindow(sender)
+    }
+    
+    func includeDependenciesChanged(newState: NSControl.StateValue) {
+        // Update defaults and rerun update
+        userDefaults.set(newState, forKey: "includeDependencies")
+        check_outdated()
+    }
+    
+    func updateIntervalChanged(newInterval: TimeInterval?) {
+        // If newInterval is not given, then no timer should be scheduled
+        let period = newInterval ?? -1
+        userDefaults.setValue(period, forKey: "updateInterval")
+        self.setupTimers()
+    }
+    
     // Quit any running process and application
     @IBAction func quitClicked(sender: NSMenuItem) {
         let notificationName = Notification.Name.init("Quit Clicked")
@@ -334,11 +370,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
         os_log("Tearing down timers.", type: .info)
-        for timer in timers {
-            if timer.isValid {
-                timer.invalidate()
-            }
-        }
+        timer?.invalidate()
     }
 
 }
