@@ -25,6 +25,7 @@ class PreferencesController: NSWindowController {
 
         self.window?.center()
         self.window?.makeKeyAndOrderFront(nil)
+        self.window?.level = .popUpMenu
         NSApp.activate(ignoringOtherApps: true)
         
         // Update view with current preferences
