@@ -214,6 +214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             let item = NSMenuItem.init(title: title,
                                        action: #selector(AppDelegate.upgradePackage),
                                        keyEquivalent: "")
+            item.toolTip = package.desc
             packageMenu.addItem(item)
         }
     }
