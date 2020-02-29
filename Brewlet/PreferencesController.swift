@@ -11,12 +11,14 @@ import Cocoa
 protocol PreferencesDelegate {
     func updateIntervalChanged(newInterval: TimeInterval?) // if nil, then don't update
     func includeDependenciesChanged(newState: NSControl.StateValue)
+    func shareAnalyticsChanged(newState: NSControl.StateValue)
 }
 
 class PreferencesController: NSWindowController {
 
     @IBOutlet weak var includeDependencies: NSButton!
     @IBOutlet weak var updateInterval: NSSlider!
+    @IBOutlet weak var shareAnalytics: NSButton!
     
     var delegate: PreferencesDelegate?
     
@@ -43,10 +45,20 @@ class PreferencesController: NSWindowController {
             let intervalIndex = (currentInterval / 3600) * 2
             updateInterval.doubleValue = intervalIndex
         }
+        
+        if defaults.bool(forKey: "shareAnalytics") {
+            shareAnalytics.state = .on
+        } else {
+            shareAnalytics.state = .off
+        }
     }
     
     @IBAction func includeDependenciesPressed(_ sender: NSButton) {
         delegate?.includeDependenciesChanged(newState: sender.state)
+    }
+    
+    @IBAction func shareAnalyticsPressed(_ sender: NSButton) {
+        delegate?.shareAnalyticsChanged(newState: sender.state)
     }
     
     @IBAction func updateIntervalChanged(_ sender: NSSlider) {

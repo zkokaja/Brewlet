@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencesController" customModule="Brewlet" customModuleProvider="target">
             <connections>
                 <outlet property="includeDependencies" destination="064-ff-SAT" id="EcF-bh-YXb"/>
+                <outlet property="shareAnalytics" destination="Fzh-vX-V3a" id="IWq-vV-CyK"/>
                 <outlet property="updateInterval" destination="WZd-Rc-dmM" id="PzN-hH-YKX"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -18,14 +19,14 @@
         <window title="Brewlet Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="496" height="131"/>
+            <rect key="contentRect" x="196" y="240" width="496" height="166"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="496" height="131"/>
+                <rect key="frame" x="0.0" y="0.0" width="496" height="166"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <slider verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WZd-Rc-dmM">
-                        <rect key="frame" x="187" y="83" width="291" height="24"/>
+                        <rect key="frame" x="187" y="118" width="291" height="24"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="24" id="NaI-IH-328"/>
                         </constraints>
@@ -35,7 +36,7 @@
                         </connections>
                     </slider>
                     <textField toolTip="Check for outdated packages, and update metadata at the given time period." horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NmZ-9C-va2">
-                        <rect key="frame" x="18" y="95" width="156" height="16"/>
+                        <rect key="frame" x="18" y="130" width="156" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Check for updates every:" id="N2S-tz-WUd">
                             <font key="font" metaFont="system"/>
@@ -44,7 +45,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r7G-Rd-0g0">
-                        <rect key="frame" x="449" y="60" width="40" height="16"/>
+                        <rect key="frame" x="449" y="95" width="40" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Never" id="GOR-Ow-dRi">
                             <font key="font" metaFont="system"/>
@@ -53,7 +54,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bLq-eF-t2c">
-                        <rect key="frame" x="216" y="60" width="27" height="16"/>
+                        <rect key="frame" x="216" y="95" width="27" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="1 hr" id="Lnj-m1-a4v">
                             <font key="font" metaFont="system"/>
@@ -62,16 +63,16 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tdj-10-P2m">
-                        <rect key="frame" x="336" y="60" width="29" height="16"/>
+                        <rect key="frame" x="332" y="95" width="35" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="3 hr" id="A5d-kA-hqR">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="3 hrs" id="A5d-kA-hqR">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <button toolTip="Show and notify user about outdated packages that are dependencies of main packages." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="064-ff-SAT">
-                        <rect key="frame" x="18" y="18" width="198" height="18"/>
+                        <rect key="frame" x="18" y="53" width="198" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Include dependency updates" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JV5-ba-lsL">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -81,12 +82,23 @@
                             <action selector="includeDependenciesPressed:" target="-2" id="5Yc-Nx-7qp"/>
                         </connections>
                     </button>
+                    <button toolTip="Toggle Homebrew's analytics on or off respectively." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fzh-vX-V3a">
+                        <rect key="frame" x="18" y="25" width="116" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Share Analytics" bezelStyle="regularSquare" imagePosition="left" inset="2" id="qE3-XI-fiN">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="shareAnalyticsPressed:" target="-2" id="n9R-Qz-5PE"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="-3763" y="-16"/>
+            <point key="canvasLocation" x="-3869" y="-99"/>
         </window>
     </objects>
 </document>

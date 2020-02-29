@@ -46,12 +46,6 @@
                         <action selector="export_listWithSender:" target="Voe-Tx-rLC" id="mc2-8s-kXb"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Updating analytics..." tag="6" enabled="NO" toolTip="Toggle Homebrew's analytics on or off respectively." id="wMo-5U-HDC">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="toggle_analyticsWithSender:" target="Voe-Tx-rLC" id="hqt-hQ-aKu"/>
-                    </connections>
-                </menuItem>
                 <menuItem isSeparatorItem="YES" id="UQP-uE-Rhp"/>
                 <menuItem title="Info" tag="3" enabled="NO" toolTip="Brief statistics for your Homebrew installation." id="j23-vG-Pr4">
                     <modifierMask key="keyEquivalentModifierMask"/>

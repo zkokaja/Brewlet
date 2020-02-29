@@ -17,8 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     let name2tag = ["outdated":  1,
                     "update": 2,
                     "info": 3,
-                    "packages": 4,
-                    "analytics": 6]
+                    "packages": 4]
     
     @IBOutlet weak var statusMenu: NSMenu!
     let userDefaults = UserDefaults.standard
@@ -48,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         // Run initial tasks to set status
         update_upgrade(sender: nil)
         update_info()
-        update_analytics(sender: statusMenu.item(withTag: name2tag["analytics"]!)!)
+        update_analytics()
         setupTimers()
     }
     
@@ -71,7 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         timer = Timer.scheduledTimer(withTimeInterval: period, repeats: true) { _ in
             self.update_upgrade(sender: nil)
             self.update_info()
-            self.update_analytics(sender: self.statusMenu.item(withTag: self.name2tag["analytics"]!)!)
+            self.update_analytics()
         }
         
         os_log("Scheduled a timer with a period of %f seconds", type: .info, period)
@@ -103,10 +102,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         statusItem.button?.toolTip = "Brewlet. Last updated \(dateStr)"
     }
     
-    @IBAction func toggle_analytics(sender: NSMenuItem) {
-        let command = sender.title.contains("on") ? "on" : "off"
-        run_command(arguments: ["analytics", command]) { (_,_) in
-            self.update_analytics(sender: sender)
+    func toggle_analytics(turnOn: Bool) {
+        let command = turnOn ? "on" : "off"
+        run_command(arguments: ["analytics", command]) { _,_ in
+            self.userDefaults.set(turnOn, forKey: "shareAnalytics")
+            os_log("Updated analytics to %s state", type: .info, command)
         }
     }
     
@@ -127,21 +127,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
-    func update_analytics(sender: NSMenuItem) {
-        // Disable menu temporarily
-        sender.isEnabled = false
-        sender.title = "Updating analytics..."
-        
+    func update_analytics() {
         run_command(arguments: ["analytics", "state"]) { (_, data: Data) in
             let output = String(decoding: data, as: UTF8.self)
-            if output.lowercased().contains("disabled") {
-                sender.title = "Toggle analytics on"
-            } else {
-                sender.title = "Toggle analytics off"
-            }
-            
-            sender.isEnabled = true
-            os_log("Updated analytics.", type: .info)
+            let isDisabled = output.lowercased().contains("disabled")
+            self.userDefaults.set(!isDisabled, forKey: "shareAnalytics")
+            os_log("Currently %s sharing analytics", type: .info, isDisabled ? "not" : "am")
         }
     }
     
@@ -369,6 +360,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         // Update defaults and rerun update
         userDefaults.set(newState, forKey: "includeDependencies")
         check_outdated()
+    }
+    
+    func shareAnalyticsChanged(newState: NSControl.StateValue) {
+        toggle_analytics(turnOn: newState == .on)
     }
     
     func updateIntervalChanged(newInterval: TimeInterval?) {
