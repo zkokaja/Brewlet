@@ -3,8 +3,8 @@
 Brewlet
 </h1>
 
-<a href="https://github.com/zkokaja/Brewlet/releases/tag/v1.2">
-  <img src="images/release-badge.svg" alt="Release Version 1.2"/>
+<a href="https://github.com/zkokaja/Brewlet/releases/tag/v1.3">
+  <img src="images/release-badge.svg" alt="Release Version 1.3"/>
 </a>
 
 The missing menulet for [brew.sh].
@@ -40,9 +40,8 @@ I am currently working on adding more features, listed in order of priority
 here:
 
 - Ability to handle casks
-- Add preferences window for time intervals
 - Ability to install brew if not found
-- Look for missing packages
+- About page with detailed information
 
 ## Update vs Upgrade
 
