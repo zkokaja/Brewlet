@@ -17,7 +17,7 @@
                BlueprintIdentifier = "BBC6CAAC23EF476B00189F94"
                BuildableName = "Brewlet.app"
                BlueprintName = "Brewlet"
-               ReferencedContainer = "container:BrewLet.xcodeproj">
+               ReferencedContainer = "container:Brewlet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "070E0CA42471AC81001B38ED"
+               BuildableName = "BrewletTests.xctest"
+               BlueprintName = "BrewletTests"
+               ReferencedContainer = "container:Brewlet.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -47,7 +57,7 @@
             BlueprintIdentifier = "BBC6CAAC23EF476B00189F94"
             BuildableName = "Brewlet.app"
             BlueprintName = "Brewlet"
-            ReferencedContainer = "container:BrewLet.xcodeproj">
+            ReferencedContainer = "container:Brewlet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +74,7 @@
             BlueprintIdentifier = "BBC6CAAC23EF476B00189F94"
             BuildableName = "Brewlet.app"
             BlueprintName = "Brewlet"
-            ReferencedContainer = "container:BrewLet.xcodeproj">
+            ReferencedContainer = "container:Brewlet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

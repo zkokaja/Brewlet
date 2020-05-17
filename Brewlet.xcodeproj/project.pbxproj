@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070E0CA82471AC81001B38ED /* BrewletTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070E0CA72471AC81001B38ED /* BrewletTests.swift */; };
 		BB95C6F024030F1B00995E0A /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB95C6EE24030F1B00995E0A /* PreferencesController.swift */; };
 		BB95C6F124030F1B00995E0A /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB95C6EF24030F1B00995E0A /* PreferencesController.xib */; };
 		BBC6CAB123EF476B00189F94 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC6CAB023EF476B00189F94 /* AppDelegate.swift */; };
@@ -15,7 +16,20 @@
 		BBED83622400E6B500B4ADA8 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBED83612400E6B500B4ADA8 /* Package.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		070E0CAA2471AC81001B38ED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BBC6CAA523EF476B00189F94 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBC6CAAC23EF476B00189F94;
+			remoteInfo = Brewlet;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		070E0CA52471AC81001B38ED /* BrewletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrewletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		070E0CA72471AC81001B38ED /* BrewletTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewletTests.swift; sourceTree = "<group>"; };
+		070E0CA92471AC81001B38ED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BB95C6EE24030F1B00995E0A /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
 		BB95C6EF24030F1B00995E0A /* PreferencesController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesController.xib; sourceTree = "<group>"; };
 		BBC6CAAD23EF476B00189F94 /* Brewlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Brewlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -28,6 +42,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		070E0CA22471AC81001B38ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BBC6CAAA23EF476B00189F94 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -38,10 +59,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		070E0CA62471AC81001B38ED /* BrewletTests */ = {
+			isa = PBXGroup;
+			children = (
+				070E0CA72471AC81001B38ED /* BrewletTests.swift */,
+				070E0CA92471AC81001B38ED /* Info.plist */,
+			);
+			path = BrewletTests;
+			sourceTree = "<group>";
+		};
 		BBC6CAA423EF476B00189F94 = {
 			isa = PBXGroup;
 			children = (
 				BBC6CAAF23EF476B00189F94 /* Brewlet */,
+				070E0CA62471AC81001B38ED /* BrewletTests */,
 				BBC6CAAE23EF476B00189F94 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				BBC6CAAD23EF476B00189F94 /* Brewlet.app */,
+				070E0CA52471AC81001B38ED /* BrewletTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,6 +104,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		070E0CA42471AC81001B38ED /* BrewletTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 070E0CAC2471AC81001B38ED /* Build configuration list for PBXNativeTarget "BrewletTests" */;
+			buildPhases = (
+				070E0CA12471AC81001B38ED /* Sources */,
+				070E0CA22471AC81001B38ED /* Frameworks */,
+				070E0CA32471AC81001B38ED /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				070E0CAB2471AC81001B38ED /* PBXTargetDependency */,
+			);
+			name = BrewletTests;
+			productName = BrewletTests;
+			productReference = 070E0CA52471AC81001B38ED /* BrewletTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		BBC6CAAC23EF476B00189F94 /* Brewlet */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BBC6CABB23EF476C00189F94 /* Build configuration list for PBXNativeTarget "Brewlet" */;
@@ -99,6 +149,10 @@
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = zzada;
 				TargetAttributes = {
+					070E0CA42471AC81001B38ED = {
+						CreatedOnToolsVersion = 11.3.1;
+						TestTargetID = BBC6CAAC23EF476B00189F94;
+					};
 					BBC6CAAC23EF476B00189F94 = {
 						CreatedOnToolsVersion = 11.3.1;
 					};
@@ -118,11 +172,19 @@
 			projectRoot = "";
 			targets = (
 				BBC6CAAC23EF476B00189F94 /* Brewlet */,
+				070E0CA42471AC81001B38ED /* BrewletTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		070E0CA32471AC81001B38ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BBC6CAAB23EF476B00189F94 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -136,6 +198,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		070E0CA12471AC81001B38ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				070E0CA82471AC81001B38ED /* BrewletTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BBC6CAA923EF476B00189F94 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -147,6 +217,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		070E0CAB2471AC81001B38ED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBC6CAAC23EF476B00189F94 /* Brewlet */;
+			targetProxy = 070E0CAA2471AC81001B38ED /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		BBC6CAB423EF476C00189F94 /* MainMenu.xib */ = {
@@ -160,6 +238,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		070E0CAD2471AC81001B38ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BrewletTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = zkokaja.BrewletTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Brewlet.app/Contents/MacOS/Brewlet";
+			};
+			name = Debug;
+		};
+		070E0CAE2471AC81001B38ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BrewletTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = zkokaja.BrewletTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Brewlet.app/Contents/MacOS/Brewlet";
+			};
+			name = Release;
+		};
 		BBC6CAB923EF476C00189F94 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -312,6 +428,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		070E0CAC2471AC81001B38ED /* Build configuration list for PBXNativeTarget "BrewletTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				070E0CAD2471AC81001B38ED /* Debug */,
+				070E0CAE2471AC81001B38ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BBC6CAA823EF476B00189F94 /* Build configuration list for PBXProject "Brewlet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
