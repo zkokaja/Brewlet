@@ -18,29 +18,29 @@
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <menu id="NHW-zJ-Uiw">
+        <menu autoenablesItems="NO" id="NHW-zJ-Uiw">
             <items>
                 <menuItem title="Checking..." tag="1" enabled="NO" toolTip="Count the number of installed formulae that have an updated version available." id="Kpo-2q-cbk">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="Update" tag="2" toolTip="Fetch the newest version of Homebrew and all formulae from GitHub, and upgrade outdated formulae." id="R04-4l-Fp2">
+                <menuItem title="Update" tag="2" enabled="NO" toolTip="Fetch the newest version of Homebrew and all formulae from GitHub, and upgrade outdated formulae." id="R04-4l-Fp2">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="update_upgradeWithSender:" target="Voe-Tx-rLC" id="eNW-DL-GJ9"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Packages" tag="4" hidden="YES" id="UOg-cC-wep">
+                <menuItem title="Packages" tag="4" hidden="YES" enabled="NO" id="UOg-cC-wep">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Packages" id="SxN-qY-H1K"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="qEj-Er-ubf"/>
-                <menuItem title="Clean up" tag="4" toolTip="Remove stale lock files and outdated downloads for all formulae and casks, and remove old versions of installed formulae." id="5ba-uR-xp6">
+                <menuItem title="Clean up" tag="5" toolTip="Remove stale lock files and outdated downloads for all formulae and casks, and remove old versions of installed formulae." id="5ba-uR-xp6">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="cleanupWithSender:" target="Voe-Tx-rLC" id="w4P-cv-vaJ"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Export list" tag="5" toolTip="Export all installed formulae to a file in your Downloads folder." id="efH-iu-XU3">
+                <menuItem title="Export list" tag="6" toolTip="Export all installed formulae to a file in your Downloads folder." id="efH-iu-XU3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="export_listWithSender:" target="Voe-Tx-rLC" id="mc2-8s-kXb"/>

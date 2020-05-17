@@ -81,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     @IBAction func cleanup(sender: NSMenuItem) {
         run_command(arguments: ["cleanup"], outputHandler: { (_,_) in
             os_log("Cleaned up.", type: .info)
-            self.update_info()            
+            self.update_info()
         })
     }
     
@@ -91,9 +91,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let command = isOutdated && sender != nil ? "upgrade" : "update"
         let tmpFile = getTemporaryFile(withName: "brewlet-upgrade.log")
         
+        let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
+        updateItem.isEnabled = false
+        updateItem.title = command == "upgrade" ? "Upgrading..." : "Updating..."
+        
+        let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
+        packageItem.isEnabled = false
+        
         self.run_command(arguments: [command], fileRedirect: tmpFile) { _,_ in
             os_log("Ran %s command.", type: .info, command)
             
+            updateItem.isEnabled = true
             animation.invalidate()
             self.check_outdated()
         }
@@ -140,6 +148,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let statusItem = statusMenu.item(withTag: 0)!
         statusItem.title = "Checking..."
         
+        let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
+        updateItem.title = "Updating..."
+        updateItem.isEnabled = false
+        
+        let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
+        packageItem.isEnabled = false
+        
         run_command(arguments: ["info", "--json", "--installed"]) { (_, data: Data) in
             
             // Determine which packages to include
@@ -173,6 +188,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 iconName = "BrewletIcon-Color"
                 updateItem.title = "Upgrade"
                 packageItem.isHidden = false
+                packageItem.isEnabled = true
                 self.fillPackageMenu(packageMenu: packageItem.submenu!, packages: outdatedPackages)
                 
                 // Only notify end-user when transitioning from having no updates to updates
@@ -185,7 +201,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 iconName = "BrewletIcon-Black"
                 updateItem.title = "Update"
                 packageItem.isHidden = true
+                packageItem.isEnabled = false
             }
+            
+            updateItem.isEnabled = true
 
             // Update icon in main thread
             DispatchQueue.main.async {
