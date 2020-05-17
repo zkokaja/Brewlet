@@ -19,6 +19,10 @@ class BrewletTests: XCTestCase {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
         delegate = NSApplication.shared.delegate as! AppDelegate
+        
+        // Re-initialize defaults instead of triggering `applicationDidFinishLaunching`
+        delegate.statusItem.button?.toolTip = "Brewlet"
+        delegate.statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
     }
 
     override func tearDown() {
@@ -31,6 +35,21 @@ class BrewletTests: XCTestCase {
         let d = Date(timeIntervalSinceReferenceDate: 410220000)
         let f = delegate.formatDate(date: d)
         XCTAssert(f == "Dec 31, 2013 at 5:00 PM")
+    }
+    
+    func testAnimateIconImages() {
+        let animateTimer = delegate.animateIcon()
+        
+        // Status button image name initial value
+        XCTAssert(delegate.statusItem.button?.image?.name() == "BrewletIcon-Black")
+        
+        // Trigger the timer 7 times, the status icon name will increment from "Brewlet-Filled-0" to "Brewlet-Filled-6"
+        for n in 0...6 {
+            animateTimer.fire()
+            let statusImageName = (delegate.statusItem.button?.image?.name())!
+            NSLog("Status Image: \(statusImageName)")
+            XCTAssert("Brewlet-Filled-\(n)" == statusImageName)
+        }
     }
 
 //    func testToggleAnalytics() {
