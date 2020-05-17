@@ -51,6 +51,17 @@ class BrewletTests: XCTestCase {
             XCTAssert("Brewlet-Filled-\(n)" == statusImageName)
         }
     }
+    
+    /// Ensure user defaults is updated to desired interval value
+    func testUpdateIntervalChanges() {
+        delegate.updateIntervalChanged(newInterval: 3000)
+        let v0 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
+        XCTAssert(v0 == 3000)
+        
+        delegate.updateIntervalChanged(newInterval: 3600)
+        let v1 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
+        XCTAssert(v1 == 3600)
+    }
 
 //    func testToggleAnalytics() {
 //
