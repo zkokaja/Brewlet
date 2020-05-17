@@ -6,11 +6,23 @@
 //  Copyright © 2020 zzada. All rights reserved.
 //
 
+// TODO - mock "run_command"
+
 import XCTest
 
 @testable import Brewlet
 
 class BrewletTests: XCTestCase {
+    
+    /// App delegate where functions with side-effects have been removed
+    class StatelessAppDelegate : AppDelegate {
+        
+        /// `run_command` where `brew` is not actually invoked
+        override func run_command(arguments: [String], fileRedirect: FileHandle? = nil, outputHandler: @escaping (Process, Data) -> Void) {
+            NSLog("overridden `run_command`")
+        }
+    
+    }
 
     // Create placeholder of application delegate
     var delegate: AppDelegate!
@@ -18,7 +30,7 @@ class BrewletTests: XCTestCase {
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
-        delegate = NSApplication.shared.delegate as! AppDelegate
+        delegate = StatelessAppDelegate() as! AppDelegate
         
         // Re-initialize defaults instead of triggering `applicationDidFinishLaunching`
         delegate.statusItem.button?.toolTip = "Brewlet"
@@ -62,6 +74,19 @@ class BrewletTests: XCTestCase {
         let v1 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
         XCTAssert(v1 == 3600)
     }
+    
+    // NOTE: this does not work, as the overriden `run_command` will not trigger the
+    // self.userDefaults.set(turnOn, forKey: "shareAnalytics") in `toggle_analytics`
+//    /// Toggle share analytics in preferences - `brew` command is not invoked as  delegate method `run_command` has been overriden
+//    func testShareAnalyticsChanged() {
+//        delegate.shareAnalyticsChanged(newState: .on)
+//        let v0 = delegate.userDefaults.bool(forKey: "shareAnalytics")
+//        XCTAssert(v0 == true)
+//
+//        delegate.shareAnalyticsChanged(newState: .off)
+//        let v1 = delegate.userDefaults.bool(forKey: "shareAnalytics")
+//        XCTAssert(v1 == false)
+//    }
 
 //    func testToggleAnalytics() {
 //
