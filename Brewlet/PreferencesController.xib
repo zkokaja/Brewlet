@@ -93,6 +93,22 @@
                             <action selector="shareAnalyticsPressed:" target="-2" id="n9R-Qz-5PE"/>
                         </connections>
                     </button>
+                    <button toolTip="Show and notify user about outdated packages that are dependencies of main packages." horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gf3-wD-l3z">
+                        <rect key="frame" x="219" y="50" width="21" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" controlSize="mini" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Mk7-vH-PLL">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="menu" size="9"/>
+                        </buttonCell>
+                    </button>
+                    <button toolTip="Toggle Homebrew's analytics on or off respectively." horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PXg-pr-ea1">
+                        <rect key="frame" x="140" y="22" width="21" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" controlSize="mini" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5V8-03-j17">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="menu" size="9"/>
+                        </buttonCell>
+                    </button>
                 </subviews>
             </view>
             <connections>
