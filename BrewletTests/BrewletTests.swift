@@ -10,52 +10,47 @@ import XCTest
 
 @testable import Brewlet
 
+
+//            // Mock closure data depending on `brew` command arguments when the data variable is leveraged
+//            var data = Data()
+//            switch arguments {
+//            case ["info", "--json", "--installed"]:
+//                data = Data()
+//            }
+
+
 class BrewletTests: XCTestCase {
     
     // Create placeholder of application delegate to be set in `setUp`
-    var delegate: AppDelegate!
+    var delegate: StatelessAppDelegate!
     
     /// App delegate where functions with side-effects have been removed
     class StatelessAppDelegate : AppDelegate {
         
-        /// `run_command` where `brew` is not actually invoked
+        // allow unit tests to overwrite the stdout of the `run_command` closure
+        var stdout: String = ""
+        
+        /// `run_command` where `brew` is  not invoked
         override func run_command(
             arguments: [String],
             fileRedirect: FileHandle? = nil,
             outputHandler: @escaping (Process, Data) -> Void) {
             
-            // Mock closure data depending on `brew` command arguments when the data variable is leveraged
-            var data = Data()
-            switch arguments {
-            case ["list", "-1"]:
-                data = """
-                    fzf
-                    vim
-                    """.data(using: .utf8)!
-            case ["analytics", "state"]:
-                let stdout = """
-                    Analytics are enabled.
-                    UUID: <redacted>
-                    """
-                data = stdout.data(using: .utf8)!
-            case ["info", "--json", "--installed"]:
-                data = Data()
-            case ["info"]:
-                data = "231 kegs, 197,732 files, 5.1GB".data(using: .utf8)!
-            default:
-                data = Data()
-            }
-            
             // Return parameters for closure
-            outputHandler(Process(), data)
+            outputHandler(Process(), self.stdout.data(using: .utf8)!)
         }
         
     }
- 
+    
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
-        delegate = StatelessAppDelegate() as AppDelegate
+        delegate = StatelessAppDelegate()
+        
+        // Initialize MainMenu.xib
+        var objects: NSArray?
+        Bundle.main.loadNibNamed("MainMenu", owner: delegate, topLevelObjects: &objects)
+        delegate.statusMenu = objects![0] as? NSMenu
         
         // Re-initialize defaults instead of triggering `applicationDidFinishLaunching`
         delegate.statusItem.button?.toolTip = "Brewlet"
@@ -128,6 +123,10 @@ class BrewletTests: XCTestCase {
     
     /// `brew list -1` contents are written to `brew-packages.txt`
     func testExportList() {
+        
+        // re-instantiatiate delegate with mocked stdout
+        delegate.stdout = "fzf\nfzf"
+        
         delegate.export_list(sender: NSMenuItem())
         let file = FileManager.default.urls(
             for: .downloadsDirectory,
@@ -136,7 +135,7 @@ class BrewletTests: XCTestCase {
         NSLog("Reading from file: \(file)")
         do {
             let contents = try String(contentsOf: file, encoding: .utf8)
-            XCTAssert(contents == "fzf\nvim")
+            XCTAssert(contents == "fzf\nfzf")
         } catch {
             NSLog("Failed reading file")
         }
@@ -144,8 +143,39 @@ class BrewletTests: XCTestCase {
     
     /// userDefault `shareAnalytics` is set to `brew analytics state`
     func testUpdateAnalytics() {
-        // TODO: mock both enabled and disabled analytics
+        delegate.stdout = """
+        Analytics are enabled.
+        UUID: <redacted>
+        """
         delegate.update_analytics()
         XCTAssert(delegate.userDefaults.bool(forKey: "shareAnalytics") == true)
+        
+        delegate.stdout = """
+        Analytics are disabled.
+        """
+        delegate.update_analytics()
+        XCTAssert(delegate.userDefaults.bool(forKey: "shareAnalytics") == false)
     }
+    
+//    /// TODO: fix fatal error
+//    /// 
+//    /// Info status item title is updated with `brew info` output
+//    func testUpdateInfo() {
+//        delegate.stdout = """
+//        231 kegs, 197,732 files, 5.1GB
+//        """
+//
+//        // Load MainMenu from xib
+//        var objects: NSArray?
+//        Bundle.main.loadNibNamed("MainMenu", owner: self, topLevelObjects: &objects)
+//        delegate.statusMenu = objects![0] as? NSMenu
+//
+//        // Brew info is set as title
+//        delegate.update_info()
+//        
+//        // Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value: file
+//        let item = delegate.statusMenu.item(withTag: 3)
+//
+//        XCTAssert(item?.title == delegate.stdout)
+//    }
 }
