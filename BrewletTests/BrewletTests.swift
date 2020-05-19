@@ -11,12 +11,6 @@ import XCTest
 @testable import Brewlet
 
 
-//            // Mock closure data depending on `brew` command arguments when the data variable is leveraged
-//            var data = Data()
-//            switch arguments {
-//            case ["info", "--json", "--installed"]:
-//                data = Data()
-//            }
 
 
 class BrewletTests: XCTestCase {
@@ -50,7 +44,15 @@ class BrewletTests: XCTestCase {
         // Initialize MainMenu.xib
         var objects: NSArray?
         Bundle.main.loadNibNamed("MainMenu", owner: delegate, topLevelObjects: &objects)
-        delegate.statusMenu = objects![0] as? NSMenu
+    
+        // set `statusMenu` of app delegate
+        for object in objects ?? [] {
+            NSLog("Bundle object type: \(type(of: object))")
+            if object is NSMenu {
+                delegate.statusMenu = (object as! NSMenu)
+                break
+            }
+        }
         
         // Re-initialize defaults instead of triggering `applicationDidFinishLaunching`
         delegate.statusItem.button?.toolTip = "Brewlet"
@@ -157,25 +159,25 @@ class BrewletTests: XCTestCase {
         XCTAssert(delegate.userDefaults.bool(forKey: "shareAnalytics") == false)
     }
     
-//    /// TODO: fix fatal error
-//    /// 
-//    /// Info status item title is updated with `brew info` output
-//    func testUpdateInfo() {
-//        delegate.stdout = """
-//        231 kegs, 197,732 files, 5.1GB
-//        """
-//
-//        // Load MainMenu from xib
-//        var objects: NSArray?
-//        Bundle.main.loadNibNamed("MainMenu", owner: self, topLevelObjects: &objects)
-//        delegate.statusMenu = objects![0] as? NSMenu
-//
-//        // Brew info is set as title
-//        delegate.update_info()
-//        
-//        // Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value: file
-//        let item = delegate.statusMenu.item(withTag: 3)
-//
-//        XCTAssert(item?.title == delegate.stdout)
-//    }
+    /// Info status item title is updated with `brew info` output
+    func testUpdateInfo() {
+        delegate.stdout = """
+        231 kegs, 197,732 files, 5.1GB
+        """
+
+        // Brew info is set as title
+        delegate.update_info()
+
+        // Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value: file
+        let item = delegate.statusMenu.item(withTag: 3)
+
+        XCTAssert(item?.title == delegate.stdout)
+    }
+    
+    /// TODO ["info", "--json", "--installed"]
+    func testCheckOutdated() {
+    }
+
+
+
 }
