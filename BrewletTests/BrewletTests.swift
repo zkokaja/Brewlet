@@ -10,9 +10,6 @@ import XCTest
 
 @testable import Brewlet
 
-
-
-
 class BrewletTests: XCTestCase {
     
     // Create placeholder of application delegate to be set in `setUp`
@@ -24,7 +21,7 @@ class BrewletTests: XCTestCase {
         // allow unit tests to overwrite the stdout of the `run_command` closure
         var stdout: String = ""
         
-        /// `run_command` where `brew` is  not invoked
+        /// Modified to not run `brew` subprocess, and to use `stdout` property in closure
         override func run_command(
             arguments: [String],
             fileRedirect: FileHandle? = nil,
@@ -34,10 +31,14 @@ class BrewletTests: XCTestCase {
             outputHandler(Process(), self.stdout.data(using: .utf8)!)
         }
         
+        /// Disable notifications in tests
+        override func sendNotification(title: String, body: String, timeInterval: TimeInterval = 1) {
+            // pass
+        }
+        
     }
     
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
         delegate = StatelessAppDelegate()
         
@@ -60,70 +61,37 @@ class BrewletTests: XCTestCase {
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
         delegate = nil
     }
     
-    /// Date is formatted appropriately
-    func testFormatDate() {
-        let d = Date(timeIntervalSinceReferenceDate: 410220000)
-        let f = delegate.formatDate(date: d)
-        XCTAssert(f == "Dec 31, 2013 at 5:00 PM")
+    func testSetupTimers() {
+        XCTAssertNil(delegate.timer)
+        delegate.setupTimers()
+        XCTAssertNotNil(delegate.timer)
+        XCTAssertTrue(delegate.timer!.isValid)
     }
     
-    /// Icon cycles through images when timer is fired
-    func testAnimateIconImages() {
-        let animateTimer = delegate.animateIcon()
+    func testUpdateUpgrade() {
+        delegate.update_upgrade(sender: nil)
         
-        // Status button image name initial value
-        XCTAssert(delegate.statusItem.button?.image?.name() == "BrewletIcon-Black")
-        
-        // Trigger the timer 7 times, the status icon name will increment from "Brewlet-Filled-0" to "Brewlet-Filled-6"
-        for n in 0...6 {
-            animateTimer.fire()
-            let statusImageName = (delegate.statusItem.button?.image?.name())!
-            NSLog("Status Image: \(statusImageName)")
-            XCTAssert("Brewlet-Filled-\(n)" == statusImageName)
-        }
+        // Last updated timestamp is set
+        let expectedStatus = "Brewlet. Last updated \(delegate.formatDate())"
+        XCTAssertEqual(expectedStatus, delegate.statusItem.button?.toolTip)
     }
     
-    /// User defaults are updated to desired interval value
-    func testUpdateIntervalChanges() {
-        delegate.updateIntervalChanged(newInterval: 3000)
-        let v0 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
-        XCTAssert(v0 == 3000)
-        
-        delegate.updateIntervalChanged(newInterval: 3600)
-        let v1 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
-        XCTAssert(v1 == 3600)
-    }
-    
-    /// Toggle share analytics in preferences - `brew` command is not invoked as  delegate method `run_command` has been overriden
-    func testShareAnalyticsChanged() {
-        delegate.shareAnalyticsChanged(newState: .on)
-        let v0 = delegate.userDefaults.bool(forKey: "shareAnalytics")
-        XCTAssert(v0 == true)
-        
-        delegate.shareAnalyticsChanged(newState: .off)
-        let v1 = delegate.userDefaults.bool(forKey: "shareAnalytics")
-        XCTAssert(v1 == false)
-    }
-    
-    /// `shareAnalytics` user default is toggled betweetn true and false
     func testToggleAnalytics() {
         delegate.toggle_analytics(turnOn: true)
         let s1 = delegate.userDefaults.bool(forKey: "shareAnalytics")
         NSLog("shareAnalytics: %d", s1)
-        XCTAssert(s1 == true)
+        XCTAssertTrue(s1)
         
         delegate.toggle_analytics(turnOn: false)
         let s2 = delegate.userDefaults.bool(forKey: "shareAnalytics")
         NSLog("shareAnalytics: %d", s2)
-        XCTAssert(s2 == false)
+        XCTAssertFalse(s2)
     }
     
-    /// `brew list -1` contents are written to `brew-packages.txt`
     func testExportList() {
         
         // re-instantiatiate delegate with mocked stdout
@@ -136,6 +104,7 @@ class BrewletTests: XCTestCase {
             )[0].appendingPathComponent("brew-packages.txt")
         NSLog("Reading from file: \(file)")
         do {
+            // `brew list -1` contents are written to `brew-packages.txt`
             let contents = try String(contentsOf: file, encoding: .utf8)
             XCTAssert(contents == "fzf\nfzf")
         } catch {
@@ -143,7 +112,6 @@ class BrewletTests: XCTestCase {
         }
     }
     
-    /// userDefault `shareAnalytics` is set to `brew analytics state`
     func testUpdateAnalytics() {
         delegate.stdout = """
         Analytics are enabled.
@@ -159,25 +127,73 @@ class BrewletTests: XCTestCase {
         XCTAssert(delegate.userDefaults.bool(forKey: "shareAnalytics") == false)
     }
     
-    /// Info status item title is updated with `brew info` output
+    func testCheckOutdated() {
+        // TODO
+    }
+    
+    func testFillPackageMenu() {
+        // TODO
+    }
+    
+    func testUpgradePackage() {
+        // TODO
+    }
+    
     func testUpdateInfo() {
         delegate.stdout = """
         231 kegs, 197,732 files, 5.1GB
         """
-
-        // Brew info is set as title
         delegate.update_info()
-
-        // Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value: file
         let item = delegate.statusMenu.item(withTag: 3)
-
         XCTAssert(item?.title == delegate.stdout)
     }
-    
-    /// TODO ["info", "--json", "--installed"]
-    func testCheckOutdated() {
+        
+    func testAnimateIcon() {
+        let animateTimer = delegate.animateIcon()
+        
+        // Status button image name initial value
+        XCTAssert(delegate.statusItem.button?.image?.name() == "BrewletIcon-Black")
+        
+        // Trigger the timer 7 times, the status icon name will increment from "Brewlet-Filled-0" to "Brewlet-Filled-6"
+        for n in 0...6 {
+            animateTimer.fire()
+            let statusImageName = (delegate.statusItem.button?.image?.name())!
+            NSLog("Status Image: \(statusImageName)")
+            XCTAssert("Brewlet-Filled-\(n)" == statusImageName)
+        }
     }
-
-
-
+    
+    func testGetTemporaryFile() {
+        // TODO
+    }
+    
+    func testFormatDate() {
+        let d = Date(timeIntervalSinceReferenceDate: 410220000)
+        let f = delegate.formatDate(date: d)
+        XCTAssert(f == "Dec 31, 2013 at 5:00 PM")
+    }
+    
+    func testIncludeDependenciesChanged() {
+        // TODO
+    }
+    
+    func testShareAnalyticsChanged() {
+        delegate.shareAnalyticsChanged(newState: .on)
+        let v0 = delegate.userDefaults.bool(forKey: "shareAnalytics")
+        XCTAssert(v0 == true)
+        
+        delegate.shareAnalyticsChanged(newState: .off)
+        let v1 = delegate.userDefaults.bool(forKey: "shareAnalytics")
+        XCTAssert(v1 == false)
+    }
+    
+    func testUpdateIntervalChanges() {
+        delegate.updateIntervalChanged(newInterval: 3000)
+        let v0 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
+        XCTAssert(v0 == 3000)
+        
+        delegate.updateIntervalChanged(newInterval: 3600)
+        let v1 = delegate.userDefaults.value(forKey: "updateInterval") as! Int
+        XCTAssert(v1 == 3600)
+    }
 }
