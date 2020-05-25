@@ -234,21 +234,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let packageName = String(sender.title.split(separator: " ")[0])
         let tmpFile = self.getTemporaryFile(withName: "brewlet-package-upgrade.log")
         
+        let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
+        updateItem.isEnabled = false
+        updateItem.title = "Upgrading..."
+        
+        let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
+        packageItem.isEnabled = false
+        
         run_command(arguments: ["upgrade", packageName], fileRedirect: tmpFile) { _,_ in
             os_log("Upgraded package: %s.", type: .info, packageName)
             
             animation.invalidate()
             sender.menu?.removeItem(sender)
             
+            updateItem.isEnabled = true
+            packageItem.isEnabled = true
+            
             // Update statuses
             let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
             if let n_packages = Int(statusItem.title.split(separator: " ")[0]) {
                 if n_packages > 1 {
                     statusItem.title = "\(n_packages - 1) Outdated Packages"
+                    updateItem.title = "Upgrade"
                     DispatchQueue.main.async {
                         self.statusItem.button?.image = NSImage(named: "BrewletIcon-Color")
                     }
                 } else {
+                    updateItem.title = "Update"
                     self.check_outdated()
                 }
             }
