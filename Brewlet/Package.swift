@@ -7,14 +7,27 @@
 
 import Foundation
 
+/**
+ A `brew` Package and some of its metadata.
+ */
 struct Package {
     var name: String
     var desc: String?
     var outdated: Bool
     var versions: Version
-    var installed_on_request: Bool
     var installed: [InstalledPackage]
     
+    /// A custom property that is true if any of the installed packages are installed by request,
+    /// to make searching and filtering easier.
+    var installed_on_request: Bool
+        
+    /**
+     Find the version of the latest _installed_ package.
+     
+     Assumes that the first item in the list is latest version.
+     
+     - Returns: The latest version of this package, if installed.
+     */
     func getInstalledVersion() -> String? {
         var version: String? = nil
         if !installed.isEmpty {
@@ -24,16 +37,28 @@ struct Package {
     }
 }
 
+/**
+ The version of a package.
+ */
 struct Version {
     var stable: String
 }
 
+/**
+ A package that is installed, including its version and metadata (e.g. on request, is a dependency).
+ */
 struct InstalledPackage {
     var version: String
     var installed_on_request: Bool
     var installed_as_dependency: Bool
 }
 
+/**
+ Deserialize the JSON data from `brew info --json --installed` to a list of `Package` objects.
+ 
+ - Parameter jsonData: Data representing valid `brew` JSON information.
+ - Returns: A new list of `Package`s.
+ */
 func packagesFromJson(jsonData: Data) throws -> [Package] {
     var packages = [Package]()
     if let elements = try JSONSerialization.jsonObject(with: jsonData) as? [NSDictionary] {
@@ -70,8 +95,8 @@ func packagesFromJson(jsonData: Data) throws -> [Package] {
                                     desc: desc,
                                     outdated: outdated,
                                     versions: versions,
-                                    installed_on_request: isRequested,
-                                    installed: installedPackages))
+                                    installed: installedPackages,
+                                    installed_on_request: isRequested))
         }
     }
     

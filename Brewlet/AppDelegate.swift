@@ -25,6 +25,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     
     var preferencesWindow: PreferencesController!
     
+    /***
+     Entry-point into the application.
+     
+     Runs jobs to sync with `brew` and check for outdated packages, then sets up a timer
+     to do this periodicially.
+     
+     - Parameter aNotification: Unsued.
+     */
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         
         // Set the icon
@@ -51,6 +59,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         setupTimers()
     }
     
+    /**
+     Creates a Timer that will run every periodically to synchronize with `brew`.
+     
+     The scheduled job will check for packge update, update the info stats, and analytics settings.
+     It uses a default interval of 1 hour, or the user defined preference if set.
+     
+     - Postcondition: Assigns the `timer` variable.
+     - SeeAlso: self.update_upgrade
+     */
     func setupTimers() {
         // Cancel the existing timer
         timer?.invalidate()
@@ -78,6 +95,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     
     // MARK: - Actions
     
+    /**
+     Runs `brew cleanup` and updates the info statistics.
+     
+     - Parameter sender: Unused.
+     */
     @IBAction func cleanup(sender: NSMenuItem) {
         run_command(arguments: ["cleanup"], outputHandler: { (_,_) in
             os_log("Cleaned up.", type: .info)
@@ -85,6 +107,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         })
     }
     
+    /**
+     Either run `brew update` or `brew upgrade` on all packages.
+     
+     If there are existing outdated packages and the user clicks on the upgrade menu item, this function
+     will call on the upgrade command, otherwise it will update the package list.
+     
+     - Parameter sender: Optional that is set when the menu item is clicked from the UI.
+     - SeeAlso: AppDelegate.check_outdated
+     */
     @IBAction func update_upgrade(sender: NSMenuItem?) {
         let animation = animateIcon()
         let isOutdated = self.packages.filter{$0.outdated && $0.installed_on_request}.count > 0
@@ -110,6 +141,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         statusItem.button?.toolTip = "Brewlet. Last updated \(dateStr)"
     }
     
+    /**
+     Sets the user analytics sharing preference by calling on the `brew analytics` command.
+     
+     - Parameter turnOn: True if analytics should be turned on, otherwise false.
+     - Postcondition: Sets the `shareAnalytics` key in `UserDefaults`.
+     */
     func toggle_analytics(turnOn: Bool) {
         let command = turnOn ? "on" : "off"
         run_command(arguments: ["analytics", command]) { _,_ in
@@ -118,6 +155,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Save a file containing a list of brew packages to the user's downloads directory.
+     
+     - Parameter sender:Unused.
+     - Postcondition: Saves the file `~/Downloads/brew-packages.txt`.
+     */
     @IBAction func export_list(sender: NSMenuItem) {
         run_command(arguments: ["list", "-1"]) { (_, data: Data) in
             let paths = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
@@ -135,6 +178,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Syncs `UserDefaults["shareAnalytics"]` with the current `brew analytics state` boolean.
+     */
     func update_analytics() {
         run_command(arguments: ["analytics", "state"]) { (_, data: Data) in
             let output = String(decoding: data, as: UTF8.self)
@@ -144,6 +190,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Syncs `self.packages` with `brew`'s current states for installed packages.
+     
+     Will also update the GUI with the appropriate actions (i.e. upgrade if outdated packages exist).
+     */
     func check_outdated() {
         let statusItem = statusMenu.item(withTag: 0)!
         statusItem.title = "Checking..."
@@ -163,7 +214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 ? { $0.outdated }
                 : { $0.outdated && $0.installed_on_request }
             
-            
+            // Keep only packages that are outdated and meet the above criteria
             let previousOutdatedPackageCount = self.packages.filter(criterion).count
             
             do {
@@ -175,6 +226,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 return
             }
             
+            // Update  the GUI
             var iconName = ""
             let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
             let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
@@ -215,6 +267,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Populates the Packages menu with menu items for each outdated package.
+     
+     - Parameter packageMenu: The menu to add the `NSMenuItem`s to.
+     - Parameter packages: The list of packages to add, using their name and versions.
+     */
     func fillPackageMenu(packageMenu : NSMenu, packages: [Package]) {
         for package in packages {
             let newVersion = package.versions.stable
@@ -229,6 +287,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Upgrade a single package.
+     
+     Called when a user clicks on one outdated package in the Packages menu. If this is the last
+     package in the list, reset menu labels and status. Otherwise, leave as is.
+     
+     - Parameter sender: The `NSMenuItem` representing the package to be updated.
+     */
     @objc func upgradePackage(_ sender: NSMenuItem) {
         let animation = self.animateIcon()
         let packageName = String(sender.title.split(separator: " ")[0])
@@ -267,6 +333,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Update the info statistics with `brew info` results.
+     */
     func update_info() {
         run_command(arguments: ["info"]) { (_, data: Data) in
             let info = String(decoding: data, as: UTF8.self)
@@ -278,6 +347,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     
     // MARK: - Helper functions
     
+    /**
+     Run the `brew` command with the given arguments asynchronously, and call on
+     `outputHandler` when the process completes.
+     
+     The main function that interfaces with `brew` via calls with `Process`. It will run
+     the command in a separate thread, but pipe its standard output to a buffer so that the calling
+     function can use it in the given closure.
+     
+     - Parameter arguments: A list of args to pass after the `brew` command.
+     - Parameter fileRedirect: An optional file handler for standard output. By default will be piped to a Data buffer.
+     - Parameter outputHandler: Closure to run when the command terminates (successfully or not).
+     */
     func run_command(arguments: [String],
                      fileRedirect: FileHandle? = nil,
                      outputHandler: @escaping (Process,Data) -> Void) {
@@ -319,6 +400,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Animate the status icon.
+     
+     Schedule a `Timer` that will sequentially flip through icons to make an animation.
+     
+     - Returns: A new `Timer` process ready to be started then stopped.
+     */
     func animateIcon() -> Timer {
         var frame = 0
         let animation = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
@@ -330,6 +418,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         return animation
     }
     
+    /**
+     Send a notification to the user.
+     
+     Uses the native notification center to notify the user of an event, if allowed.
+     
+     - Parameter title: The localized title, containing the reason for the alert.
+     - Parameter body: The localized message to display in the notification alert.
+     - Parameter timeInterval: The time (in seconds) that must elapse from the current time before the trigger fires.
+                               This value must be greater than zero.
+     */
     func sendNotification(title: String, body: String, timeInterval: TimeInterval = 1) {
         
         // Create the notification content
@@ -357,6 +455,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
     }
     
+    /**
+     Open a file for temporary writing.
+     
+     - Parameter withName: The name of the file to create.
+     - Returns: A handler for the new file if creation was successful (e.g. permissions).
+     */
     func getTemporaryFile(withName: String) -> FileHandle? {
         let paths = FileManager.default.temporaryDirectory
         let fileName = paths.appendingPathComponent(withName)
@@ -371,7 +475,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             return nil
         }
     }
-        
+    
+    /**
+     Format a given date, or the current time by default.
+     
+     - Parameter date: The date object to format.
+     - Returns: A relative formated string representation of the given date.
+     */
     func formatDate(date: Date = Date()) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .short
@@ -383,20 +493,41 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     
     // MARK: - Preferences functions
     
+    /**
+     Opens the preferences window when the  menu item is clicked.
+     
+     - Parameter sender: The calling menu item.
+     */
     @IBAction func openPreferences(_ sender: NSMenuItem) {
         preferencesWindow.showWindow(sender)
     }
     
+    /**
+     Handle a change of preferences for whether to include package dependencies in list of outdated packages.
+     
+     - Parameter newState: The new state of the checkbox.
+     - PostCondition: Will check for outdated packages, and update the cache.
+     */
     func includeDependenciesChanged(newState: NSControl.StateValue) {
         // Update defaults and rerun update
         userDefaults.set(newState, forKey: "includeDependencies")
         check_outdated()
     }
     
+    /**
+     Handle a change in analytics sharing preferences.
+     
+     - Parameter newState: The new state of the checkbox.
+     */
     func shareAnalyticsChanged(newState: NSControl.StateValue) {
         toggle_analytics(turnOn: newState == .on)
     }
     
+    /**
+     Handle a change in the background timer's periodic interval.
+     
+     - Parameter newInterval: The new time interval between updates, or nil to unset timer.
+     */
     func updateIntervalChanged(newInterval: TimeInterval?) {
         // If newInterval is not given, then no timer should be scheduled
         let period = newInterval ?? -1
@@ -406,7 +537,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     
     // MARK: - Termination functions
     
-    // Quit any running process and application
+    /**
+     Quit the application, and clean up timers.
+     
+     - Parameter sender: Unused.
+     - SeeAlso: AppDelegate.applicationWillTerminate
+     */
     @IBAction func quitClicked(sender: NSMenuItem) {
         let notificationName = Notification.Name.init("Quit Clicked")
         let notification = Notification.init(name: notificationName)
@@ -415,6 +551,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         NSApplication.shared.terminate(self)
     }
 
+    /**
+     Invalidates the scheduled timer.
+     
+     - Parameter aNotification: Unused.
+     */
     func applicationWillTerminate(_ aNotification: Notification) {
         os_log("Tearing down timers.", type: .info)
         timer?.invalidate()
