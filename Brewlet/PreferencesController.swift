@@ -6,6 +6,7 @@
 //  Copyright © 2020 zzada. All rights reserved.
 //
 
+import OSLog
 import Cocoa
 
 protocol PreferencesDelegate {
@@ -19,6 +20,8 @@ class PreferencesController: NSWindowController {
     @IBOutlet weak var includeDependencies: NSButton!
     @IBOutlet weak var updateInterval: NSSlider!
     @IBOutlet weak var shareAnalytics: NSButton!
+    @IBOutlet weak var autoUpgrade: NSButton!
+    @IBOutlet weak var dontNotifyAvailable: NSButton!
     
     var delegate: PreferencesDelegate?
     
@@ -50,7 +53,10 @@ class PreferencesController: NSWindowController {
             shareAnalytics.state = .on
         } else {
             shareAnalytics.state = .off
-        }
+        }        
+        
+        autoUpgrade.state = defaults.bool(forKey: "autoUpgrade") ? .on : .off
+        dontNotifyAvailable.state = defaults.bool(forKey: "dontNotify") ? .on : .off
     }
     
     @IBAction func includeDependenciesPressed(_ sender: NSButton) {
@@ -59,6 +65,16 @@ class PreferencesController: NSWindowController {
     
     @IBAction func shareAnalyticsPressed(_ sender: NSButton) {
         delegate?.shareAnalyticsChanged(newState: sender.state)
+    }
+    
+    @IBAction func autoUpgradeChanged(_ sender: NSButton) {
+        os_log("Update auto upgrade: %s", type: .info, sender.state == .on ? "on" : "off")
+        UserDefaults.standard.set(sender.state == .on, forKey: "autoUpgrade")
+    }
+    
+    @IBAction func notifyChanged(_ sender: NSButton) {
+        os_log("Update don't notify: %s", type: .info, sender.state == .on ? "on" : "off")
+        UserDefaults.standard.set(sender.state == .on, forKey: "dontNotify")
     }
     
     @IBAction func updateIntervalChanged(_ sender: NSSlider) {

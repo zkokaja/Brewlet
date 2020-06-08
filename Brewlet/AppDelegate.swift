@@ -51,7 +51,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 os_log("Notification permission error: %s", type: .error, error.debugDescription)
             }
         }
-        
         // Run initial tasks to set status
         update_upgrade(sender: nil)
         update_info()
@@ -257,13 +256,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             }
             
             updateItem.isEnabled = true
+            
+            os_log("Checked outdated status.", type: .info)
 
             // Update icon in main thread
             DispatchQueue.main.async {
                 self.statusItem.button?.image = NSImage(named: iconName)
+                
+                // Upgrade packages if configured to do so
+                let autoUpgrade = self.userDefaults.bool(forKey: "autoUpgrade")
+                if autoUpgrade && outdatedPackageCount > 0 {
+                    os_log("Auto upgrading packages.", type: .info)
+                    let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
+                    self.update_upgrade(sender: updateItem)
+                }
             }
-            
-            os_log("Checked outdated status.", type: .info)
         }
     }
     
@@ -429,6 +436,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                                This value must be greater than zero.
      */
     func sendNotification(title: String, body: String, timeInterval: TimeInterval = 1) {
+        
+        // Disable notifications based on user's preferences
+        if userDefaults.bool(forKey: "dontNotify") {
+            return
+        }
         
         // Create the notification content
         let content = UNMutableNotificationContent()
