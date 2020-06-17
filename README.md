@@ -29,9 +29,15 @@ choose specific packages:
 
 ## Installation
 
-Download the latest version from 
+Install with `brew` on the command line:
+```bash
+brew tap zkokaja/brewlet
+brew cask install brewlet
+```
+
+Or download the latest version from 
 [releases](https://github.com/zkokaja/Brewlet/releases/latest)
-or direct link
+or 
 [here (zip)](https://github.com/zkokaja/Brewlet/releases/latest/download/Brewlet.zip).
 
 ## On the horizon
