@@ -39,6 +39,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         statusItem.menu = statusMenu
         statusItem.button?.toolTip = "Brewlet"
         statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
+        statusItem.button?.image?.isTemplate = true
 
         // Set up preferences window
         preferencesWindow = PreferencesController()
