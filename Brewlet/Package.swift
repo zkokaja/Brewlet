@@ -14,6 +14,7 @@ struct Package {
     var name: String
     var desc: String?
     var outdated: Bool
+    var revision: Int = 0
     var versions: Version
     var installed: [InstalledPackage]
     
@@ -32,6 +33,10 @@ struct Package {
         var version: String? = nil
         if !installed.isEmpty {
             version = installed[0].version
+            
+            if revision > 0 {
+                version! += "_\(self.revision)"
+            }
         }
         return version
     }
@@ -66,6 +71,7 @@ func packagesFromJson(jsonData: Data) throws -> [Package] {
             let name = element["name"] as? String ?? "Unknown"
             let desc = element["desc"] as? String
             let outdated = element["outdated"] as? Bool ?? false
+            let revision = element["revision"] as? Int ?? 0
             
             // Versions
             
@@ -94,6 +100,7 @@ func packagesFromJson(jsonData: Data) throws -> [Package] {
             packages.append(Package(name: name,
                                     desc: desc,
                                     outdated: outdated,
+                                    revision: revision,
                                     versions: versions,
                                     installed: installedPackages,
                                     installed_on_request: isRequested))
