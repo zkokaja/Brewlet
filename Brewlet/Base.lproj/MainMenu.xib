@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -46,7 +46,33 @@
                         <action selector="export_listWithSender:" target="Voe-Tx-rLC" id="mc2-8s-kXb"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="UQP-uE-Rhp"/>
+                <menuItem title="Services" onStateImage="NSRefreshTemplate" tag="7" id="16i-nH-Rtd">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" autoenablesItems="NO" id="HXE-aU-scn">
+                        <items>
+                            <menuItem title="Start all" id="rAi-1r-Ujj">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleServiceAction:" target="Voe-Tx-rLC" id="t6H-Cb-xjo"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Stop all" id="XXi-Fi-c58">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleServiceAction:" target="Voe-Tx-rLC" id="DJ3-u4-RCP"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Restart all" id="MRZ-bf-Fyn">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleServiceAction:" target="Voe-Tx-rLC" id="kq7-ID-qSh"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="ib9-WK-sHV"/>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="JW5-WK-wxU"/>
                 <menuItem title="Info" tag="3" enabled="NO" toolTip="Brief statistics for your Homebrew installation." id="j23-vG-Pr4">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
@@ -64,7 +90,10 @@
                 </menuItem>
             </items>
             <accessibility help="Brewlet"/>
-            <point key="canvasLocation" x="-1555.5" y="-131"/>
+            <point key="canvasLocation" x="-1705" y="-183"/>
         </menu>
     </objects>
+    <resources>
+        <image name="NSRefreshTemplate" width="11" height="15"/>
+    </resources>
 </document>

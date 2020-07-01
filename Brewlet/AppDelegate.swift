@@ -17,13 +17,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     let name2tag = ["outdated":  1,
                     "update": 2,
                     "info": 3,
-                    "packages": 4]
+                    "packages": 4,
+                    "services": 7]
     
     @IBOutlet weak var statusMenu: NSMenu!
     let userDefaults = UserDefaults.standard
     let statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
     var preferencesWindow: PreferencesController!
+    
+    struct Service {
+        var name: String
+        var isStopped: Bool?
+    }
     
     /***
      Entry-point into the application.
@@ -39,6 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         statusItem.menu = statusMenu
         statusItem.button?.toolTip = "Brewlet"
         statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
+        statusItem.button?.image?.isTemplate = true
 
         // Set up preferences window
         preferencesWindow = PreferencesController()
@@ -52,6 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             }
         }
         // Run initial tasks to set status
+        sync_services()
         update_upgrade(sender: nil)
         update_info()
         update_analytics()
@@ -87,6 +95,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             self.update_upgrade(sender: nil)
             self.update_info()
             self.update_analytics()
+            self.sync_services()
         }
         
         os_log("Scheduled a timer with a period of %f seconds", type: .info, period)
@@ -351,6 +360,112 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             os_log("Updated info.", type: .info)
         }
     }
+    
+    /**
+     
+     */
+    func sync_services() {
+        let servicesMenu = self.statusMenu.item(withTag: self.name2tag["services"]!)!
+        servicesMenu.state = .on
+        
+        run_command(arguments: ["services"]) { (_, data: Data) in
+            var services: [Service] = []
+            
+            os_log("Syncing services.", type: .info)
+            
+            // Sync with brew
+            let data = String(decoding: data, as: UTF8.self)
+            let lines = data.split(separator: "\n")
+            for line in lines[1...] {
+                let parts = line.split(separator: " ", maxSplits: Int.max, omittingEmptySubsequences: true)
+                let package = parts[0]
+                let isStopped = parts[1] == "stopped"
+                services.append(Service(name: String(package), isStopped: isStopped))
+            }
+            
+            // Update UI
+            if services.count > 0 {
+                
+                // Make sure all are enabled
+                for item in servicesMenu.submenu!.items.filter({ $0.isEnabled == false }) {
+                    item.isEnabled = true
+                }
+                        
+                // Remove old menu items
+                for item in servicesMenu.submenu!.items.filter({ $0.tag == -1 }) {
+                    servicesMenu.submenu!.removeItem(item)
+                }
+                
+                // Add new ones
+                for service in services {
+                    let serviceItem = NSMenuItem(title: service.name, action: #selector(AppDelegate.handleServiceAction), keyEquivalent: "")
+                    serviceItem.tag = -1
+                    serviceItem.state = service.isStopped! ? .off : .on
+                    serviceItem.onStateImage = NSImage(named: NSImage.statusAvailableName)
+                    serviceItem.offStateImage = NSImage(named: NSImage.statusUnavailableName)
+                    serviceItem.mixedStateImage = NSImage(named: NSImage.statusPartiallyAvailableName)
+                    servicesMenu.submenu!.addItem(serviceItem)
+                }
+            } else {
+                // Disable all actions
+                for item in servicesMenu.submenu!.items {
+                    item.isEnabled = false
+                }
+            }
+            
+            servicesMenu.state = .off
+        }
+    }
+    
+    @IBAction func handleServiceAction(_ sender: NSMenuItem) {
+        
+        if sender.tag == -1 {
+            // The sender is a specific service
+            let service = sender.title
+            let command = sender.state == .off ? "start" : "stop"
+                        
+            sender.state = .mixed
+            sender.isEnabled = false
+            
+            let args = ["services", command, service]
+            run_command(arguments: args) { _,_ in
+                print("Done", service, command)
+                self.sync_services()
+            }
+            
+        } else {
+            // The sender is from start/stop/restart all
+            
+            var command: String
+            if sender.title.lowercased().contains("restart") {
+                command = "restart"
+            }
+            else if sender.title.lowercased().contains("start") {
+                command = "start"
+            }
+            else if sender.title.lowercased().contains("stop") {
+                command = "stop"
+            }
+            else {
+                return
+            }
+            
+            // Show service menu as being refreshed, and disable all actions
+            let servicesMenu = self.statusMenu.item(withTag: self.name2tag["services"]!)!
+            servicesMenu.state = .on
+            for item in servicesMenu.submenu!.items {
+                item.isEnabled = false
+            }
+            
+            let args = ["services", command, "--all"]
+            run_command(arguments: args) { _,_ in
+                // TODO - show somehow that services is being refresh?
+                print("Done all", command)
+                self.sync_services()
+            }
+        }
+    }
+    
     
     // MARK: - Helper functions
     
