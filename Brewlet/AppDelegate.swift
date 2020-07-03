@@ -126,8 +126,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
      */
     @IBAction func update_upgrade(sender: NSMenuItem?) {
         let animation = animateIcon()
-        let isOutdated = self.packages.filter{$0.outdated && $0.installed_on_request}.count > 0
-        let command = isOutdated && sender != nil ? "upgrade" : "update"
+        
+        // Determine which packages to include
+        let includeDependencies = self.userDefaults.bool(forKey: "includeDependencies")
+        let criterion: (Package) -> Bool = includeDependencies
+            ? { $0.outdated }
+            : { $0.outdated && $0.installed_on_request }
+        
+        let shouldUpgrade = self.packages.filter(criterion).count > 0
+        
+        let command = shouldUpgrade && sender != nil ? "upgrade" : "update"
         let tmpFile = getTemporaryFile(withName: "brewlet-upgrade.log")
         
         let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
