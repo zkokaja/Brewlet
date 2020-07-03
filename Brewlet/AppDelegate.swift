@@ -291,7 +291,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
      */
     func fillPackageMenu(packageMenu : NSMenu, packages: [Package]) {
         for package in packages {
-            let newVersion = package.versions.stable
+            let newVersion = package.getStableVersion()
             let currentVersion = package.getInstalledVersion() ?? "?"
             let title = "\(package.name) (\(currentVersion)) <  \(newVersion)"
             

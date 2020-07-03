@@ -33,10 +33,14 @@ struct Package {
         var version: String? = nil
         if !installed.isEmpty {
             version = installed[0].version
-            
-            if revision > 0 {
-                version! += "_\(self.revision)"
-            }
+        }
+        return version
+    }
+    
+    func getStableVersion() -> String {
+        var version = self.versions.stable
+        if revision > 0 {
+            version += "_\(self.revision)"
         }
         return version
     }
