@@ -384,11 +384,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             // Sync with brew
             let data = String(decoding: data, as: UTF8.self)
             let lines = data.split(separator: "\n")
-            for line in lines[1...] {
-                let parts = line.split(separator: " ", maxSplits: Int.max, omittingEmptySubsequences: true)
-                let package = parts[0]
-                let isStopped = parts[1] == "stopped"
-                services.append(Service(name: String(package), isStopped: isStopped))
+            
+            // Check that there are services before parsing the output
+            if lines.count > 0 {
+                for line in lines[1...] {
+                    let parts = line.split(separator: " ", maxSplits: Int.max, omittingEmptySubsequences: true)
+                    let package = parts[0]
+                    let isStopped = parts[1] == "stopped"
+                    services.append(Service(name: String(package), isStopped: isStopped))
+                }
             }
             
             // Update UI
