@@ -13,6 +13,7 @@ protocol PreferencesDelegate {
     func updateIntervalChanged(newInterval: TimeInterval?) // if nil, then don't update
     func includeDependenciesChanged(newState: NSControl.StateValue)
     func shareAnalyticsChanged(newState: NSControl.StateValue)
+    func brewPathChanged(newPath: String)
 }
 
 class PreferencesController: NSWindowController {
@@ -22,6 +23,7 @@ class PreferencesController: NSWindowController {
     @IBOutlet weak var shareAnalytics: NSButton!
     @IBOutlet weak var autoUpgrade: NSButton!
     @IBOutlet weak var dontNotifyAvailable: NSButton!
+    @IBOutlet weak var brewPath: NSTextField!
     
     var delegate: PreferencesDelegate?
     
@@ -57,6 +59,9 @@ class PreferencesController: NSWindowController {
         
         autoUpgrade.state = defaults.bool(forKey: "autoUpgrade") ? .on : .off
         dontNotifyAvailable.state = defaults.bool(forKey: "dontNotify") ? .on : .off
+        
+        let currentBrewPath = defaults.string(forKey: "brewPath") ?? "/usr/local/bin/brew"
+        brewPath.stringValue = currentBrewPath
     }
     
     @IBAction func includeDependenciesPressed(_ sender: NSButton) {
@@ -89,7 +94,12 @@ class PreferencesController: NSWindowController {
         }
         
         delegate?.updateIntervalChanged(newInterval: seconds)
-    }    
+    }
+    
+    @IBAction func brewPathChanged(_ sender: NSTextField) {
+        // TODO: Validate that the path is valid
+        delegate?.brewPathChanged(newPath: sender.stringValue)
+    }
     
     override var windowNibName : String! {
         return "PreferencesController"

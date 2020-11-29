@@ -496,9 +496,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     func run_command(arguments: [String],
                      fileRedirect: FileHandle? = nil,
                      outputHandler: @escaping (Process,Data) -> Void) {
+       
+        let brewPath = self.userDefaults.string(forKey: "brewPath") ?? "/usr/local/bin/brew"
         let task = Process()
         task.launchPath = "/bin/bash"
-        task.arguments = ["/usr/local/Homebrew/bin/brew"] + arguments
+        task.arguments = [brewPath] + arguments
         
         let pipe = Pipe()
         var allData = Data() // What happens to the scope of this variable when used inside the closure??
@@ -672,6 +674,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let period = newInterval ?? -1
         userDefaults.setValue(period, forKey: "updateInterval")
         self.setupTimers()
+    }
+    
+    /**
+     Handle a change of preferences for where the brew binary is.
+     
+     - Parameter newState: The new state of the textfield.
+     */
+    func brewPathChanged(newPath: String) {
+        // Update defaults and rerun update
+        userDefaults.set(newPath, forKey: "brewPath")
+        check_outdated()
     }
     
     // MARK: - Termination functions
