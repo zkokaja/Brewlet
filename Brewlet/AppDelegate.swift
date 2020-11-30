@@ -685,6 +685,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         // Update defaults and rerun update
         userDefaults.set(newPath, forKey: "brewPath")
         check_outdated()
+        update_info()
     }
     
     // MARK: - Termination functions
