@@ -496,8 +496,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     func run_command(arguments: [String],
                      fileRedirect: FileHandle? = nil,
                      outputHandler: @escaping (Process,Data) -> Void) {
-       
-        let brewPath = self.userDefaults.string(forKey: "brewPath") ?? "/usr/local/bin/brew"
+        #if arch(arm64)
+        let brewPath = userDefaults.string(forKey: "brewPath") ?? PreferencesController.HomebrewPath.appleSilicon.rawValue
+        #elseif arch(x86_64)
+        let brewPath = userDefaults.string(forKey: "brewPath") ?? PreferencesController.HomebrewPath.intel.rawValue
+        #endif
         let task = Process()
         task.launchPath = "/bin/bash"
         task.arguments = [brewPath] + arguments
