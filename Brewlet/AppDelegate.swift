@@ -384,11 +384,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             // Sync with brew
             let data = String(decoding: data, as: UTF8.self)
             let lines = data.split(separator: "\n")
-            for line in lines[1...] {
-                let parts = line.split(separator: " ", maxSplits: Int.max, omittingEmptySubsequences: true)
-                let package = parts[0]
-                let isStopped = parts[1] == "stopped"
-                services.append(Service(name: String(package), isStopped: isStopped))
+            
+            // Check that there are services before parsing the output
+            if lines.count > 0 {
+                for line in lines[1...] {
+                    let parts = line.split(separator: " ", maxSplits: Int.max, omittingEmptySubsequences: true)
+                    let package = parts[0]
+                    let isStopped = parts[1] == "stopped"
+                    services.append(Service(name: String(package), isStopped: isStopped))
+                }
             }
             
             // Update UI
@@ -492,9 +496,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     func run_command(arguments: [String],
                      fileRedirect: FileHandle? = nil,
                      outputHandler: @escaping (Process,Data) -> Void) {
+        #if arch(arm64)
+        let brewPath = userDefaults.string(forKey: "brewPath") ?? PreferencesController.HomebrewPath.appleSilicon.rawValue
+        #elseif arch(x86_64)
+        let brewPath = userDefaults.string(forKey: "brewPath") ?? PreferencesController.HomebrewPath.intel.rawValue
+        #endif
         let task = Process()
         task.launchPath = "/bin/bash"
-        task.arguments = ["/usr/local/Homebrew/bin/brew"] + arguments
+        task.arguments = [brewPath] + arguments
         
         let pipe = Pipe()
         var allData = Data() // What happens to the scope of this variable when used inside the closure??
@@ -668,6 +677,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let period = newInterval ?? -1
         userDefaults.setValue(period, forKey: "updateInterval")
         self.setupTimers()
+    }
+    
+    /**
+     Handle a change of preferences for where the brew binary is.
+     
+     - Parameter newState: The new state of the textfield.
+     */
+    func brewPathChanged(newPath: String) {
+        // Update defaults and rerun update
+        userDefaults.set(newPath, forKey: "brewPath")
+        check_outdated()
+        update_info()
     }
     
     // MARK: - Termination functions

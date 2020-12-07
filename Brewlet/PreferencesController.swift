@@ -13,6 +13,7 @@ protocol PreferencesDelegate {
     func updateIntervalChanged(newInterval: TimeInterval?) // if nil, then don't update
     func includeDependenciesChanged(newState: NSControl.StateValue)
     func shareAnalyticsChanged(newState: NSControl.StateValue)
+    func brewPathChanged(newPath: String)
 }
 
 class PreferencesController: NSWindowController {
@@ -22,8 +23,18 @@ class PreferencesController: NSWindowController {
     @IBOutlet weak var shareAnalytics: NSButton!
     @IBOutlet weak var autoUpgrade: NSButton!
     @IBOutlet weak var dontNotifyAvailable: NSButton!
-    
+    @IBOutlet weak var brewPath: NSTextField!
+    @IBOutlet weak var intel: NSButton!
+    @IBOutlet weak var appleSilicon: NSButton!
+    @IBOutlet weak var custom: NSButton!
+
     var delegate: PreferencesDelegate?
+    
+    enum HomebrewPath: String {
+        case appleSilicon = "/opt/homebrew/bin/brew"
+        case intel = "/usr/local/bin/brew"
+        case custom = ""
+    }
     
     override func windowDidLoad() {
         super.windowDidLoad()
@@ -57,6 +68,21 @@ class PreferencesController: NSWindowController {
         
         autoUpgrade.state = defaults.bool(forKey: "autoUpgrade") ? .on : .off
         dontNotifyAvailable.state = defaults.bool(forKey: "dontNotify") ? .on : .off
+        
+        #if arch(arm64)
+        let currentBrewPath = defaults.string(forKey: "brewPath") ?? HomebrewPath.appleSilicon.rawValue
+        #elseif arch(x86_64)
+        let currentBrewPath = defaults.string(forKey: "brewPath") ?? HomebrewPath.intel.rawValue
+        #endif
+        switch currentBrewPath {
+        case HomebrewPath.intel.rawValue:
+            intelSelected(nil)
+        case HomebrewPath.appleSilicon.rawValue:
+            appleSiliconSelected(nil)
+        default:
+            custom.state = .on
+            brewPath.stringValue = currentBrewPath
+        }
     }
     
     @IBAction func includeDependenciesPressed(_ sender: NSButton) {
@@ -89,7 +115,40 @@ class PreferencesController: NSWindowController {
         }
         
         delegate?.updateIntervalChanged(newInterval: seconds)
-    }    
+    }
+    
+    @IBAction func appleSiliconSelected(_ sender: Any?) {
+        appleSilicon.state = .on
+        intel.state = .off
+        custom.state = .off
+        brewPath.isEnabled = false
+        let path = HomebrewPath.appleSilicon.rawValue
+        brewPath.stringValue = path
+        delegate?.brewPathChanged(newPath: path)
+    }
+    
+    @IBAction func intelSelected(_ sender: Any?) {
+        intel.state = .on
+        appleSilicon.state = .off
+        custom.state = .off
+        brewPath.isEnabled = false
+        let path = HomebrewPath.intel.rawValue
+        brewPath.stringValue = path
+        delegate?.brewPathChanged(newPath: path)
+    }
+    
+    @IBAction func customSelected(_ sender: Any) {
+        custom.state = .on
+        appleSilicon.state = .off
+        intel.state = .off
+        brewPath.isEnabled = true
+        delegate?.brewPathChanged(newPath: brewPath.stringValue)
+    }
+    
+    @IBAction func brewPathChanged(_ sender: NSTextField) {
+        // TODO: Validate that the path is valid
+        delegate?.brewPathChanged(newPath: sender.stringValue)
+    }
     
     override var windowNibName : String! {
         return "PreferencesController"
