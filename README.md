@@ -40,6 +40,12 @@ Or download the latest version from
 or 
 [here (zip)](https://github.com/zkokaja/Brewlet/releases/latest/download/Brewlet.zip).
 
+You can upgrade to the latest version by running:
+```bash
+brew update
+brew reinstall brewlet
+```
+
 ## On the horizon
 
 I am currently working on adding more features, listed in order of priority
