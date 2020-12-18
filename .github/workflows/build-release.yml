@@ -16,7 +16,6 @@ jobs:
 
     - name: Build App
       run: |
-        sudo xcode-select -s /Applications/Xcode_11.3.app/Contents/Developer
         xcodebuild build -project 'Brewlet.xcodeproj' -scheme 'Brewlet' -destination 'generic/platform=macOS' -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
         xcodebuild -scheme 'Brewlet' -configuration Release archive -archivePath Bl.xcarchive
         xcodebuild -exportArchive -exportPath . -archivePath Bl.xcarchive/ -exportOptionsPlist Brewlet/exportOptions.plist
