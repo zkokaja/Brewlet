@@ -32,7 +32,7 @@ choose specific packages:
 Install with `brew` on the command line:
 ```bash
 brew tap zkokaja/brewlet
-brew cask install brewlet
+brew install --cask brewlet
 ```
 
 Or download the latest version from 
