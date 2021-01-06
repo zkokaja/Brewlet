@@ -261,8 +261,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 
                 // Only notify end-user when transitioning from having no updates to updates
                 if previousOutdatedPackageCount != outdatedPackageCount {
-                    self.sendNotification(title: "Updates Available",
-                                          body: "Some packages can be upgraded.")
+                    let message = (outdatedPackageCount == 1) ?
+                        "\(outdatedPackages[0].name) can be upgraded." :
+                        "\(outdatedPackageCount) packages can be upgraded."
+
+                    self.sendNotification(title: "Updates Available", body: message)
                 }
             } else {
                 statusItem.title = "Packages are up-to-date"
