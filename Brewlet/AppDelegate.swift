@@ -136,7 +136,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let shouldUpgrade = self.packages.filter(criterion).count > 0
         
         let command = shouldUpgrade && sender != nil ? "upgrade" : "update"
-        let tmpFile = getTemporaryFile(withName: "brewlet-upgrade.log")
+        let tmpFile = getTemporaryFile(withName: "brewlet-\(command).log")
         
         let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
         updateItem.isEnabled = false
@@ -512,6 +512,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             allData.append(data)
         }
         task.standardOutput = fileRedirect != nil ? fileRedirect : pipe
+        task.standardError = task.standardOutput
         
         task.terminationHandler = { (process: Process) in
             if let stdout = process.standardOutput as? Pipe {
@@ -606,8 +607,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
      - Returns: A handler for the new file if creation was successful (e.g. permissions).
      */
     func getTemporaryFile(withName: String) -> FileHandle? {
-        let paths = FileManager.default.temporaryDirectory
-        let fileName = paths.appendingPathComponent(withName)
+        let homeDir = FileManager.default.homeDirectoryForCurrentUser
+        let logDir = homeDir.appendingPathComponent("Library/Logs/Brewlet")
+
+        // Create log dir if it does not exist
+        if FileManager.default.fileExists(atPath: logDir.path, isDirectory: nil) == false {
+            do {
+                try FileManager.default.createDirectory(at: logDir, withIntermediateDirectories: false)
+            } catch {
+                os_log("Unable to create log directory: %s", type: .error, "\(logDir.path)")
+            }
+        }
+
+        // Create log file
+        let fileName = logDir.appendingPathComponent(withName)
         let success = FileManager.default.createFile(atPath: fileName.path, contents: nil, attributes: nil)
         
         if success {
