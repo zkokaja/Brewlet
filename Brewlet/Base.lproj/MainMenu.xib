@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -27,6 +27,12 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="update_upgradeWithSender:" target="Voe-Tx-rLC" id="eNW-DL-GJ9"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Open log" tag="9" alternate="YES" id="Qnp-yv-b7F">
+                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                    <connections>
+                        <action selector="openLogWithSender:" target="Voe-Tx-rLC" id="3Ax-Dl-9s0"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Packages" tag="4" hidden="YES" enabled="NO" id="UOg-cC-wep">
@@ -94,6 +100,6 @@
         </menu>
     </objects>
     <resources>
-        <image name="NSRefreshTemplate" width="11" height="15"/>
+        <image name="NSRefreshTemplate" width="14" height="16"/>
     </resources>
 </document>

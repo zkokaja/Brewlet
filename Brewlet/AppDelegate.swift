@@ -8,6 +8,7 @@
 import Cocoa
 import OSLog
 import UserNotifications
+import AppKit.NSWorkspace
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
@@ -58,6 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 os_log("Notification permission error: %s", type: .error, error.debugDescription)
             }
         }
+        
         // Run initial tasks to set status
         sync_services()
         update_upgrade(sender: nil)
@@ -104,6 +106,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     // MARK: - Actions
     
     /**
+     
+     */
+    @IBAction func openLog(sender: NSMenuItem) {
+        let homeDir = FileManager.default.homeDirectoryForCurrentUser
+        let logDir = homeDir.appendingPathComponent("Library/Logs/Brewlet")
+        let logFile = logDir.path + "/brewlet.log"
+        NSWorkspace.shared.openFile(logFile, withApplication: "Console")
+        os_log("Opened log file.", type: .info)
+    }
+    
+    /**
      Runs `brew cleanup` and updates the info statistics.
      
      - Parameter sender: Unused.
@@ -136,7 +149,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let shouldUpgrade = self.packages.filter(criterion).count > 0
         
         let command = shouldUpgrade && sender != nil ? "upgrade" : "update"
-        let tmpFile = getTemporaryFile(withName: "brewlet-\(command).log")
+        let tmpFile = getLogFile()
         
         let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
         updateItem.isEnabled = false
@@ -325,7 +338,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     @objc func upgradePackage(_ sender: NSMenuItem) {
         let animation = self.animateIcon()
         let packageName = String(sender.title.split(separator: " ")[0])
-        let tmpFile = self.getTemporaryFile(withName: "brewlet-package-upgrade.log")
+        let tmpFile = getLogFile()
         
         let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
         updateItem.isEnabled = false
@@ -364,11 +377,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
      Update the info statistics with `brew info` results.
      */
     func update_info() {
-        run_command(arguments: ["info"]) { (_, data: Data) in
+        run_command(arguments: ["info"]) { (process: Process, data: Data) in
             let info = String(decoding: data, as: UTF8.self)
-            let statusItem = self.statusMenu.item(withTag: self.name2tag["info"]!)!
-            statusItem.title = info
-            os_log("Updated info.", type: .info)
+            if process.terminationStatus == 0 {
+                let statusItem = self.statusMenu.item(withTag: self.name2tag["info"]!)!
+                statusItem.title = info
+                os_log("Updated info.", type: .info)
+            } else {
+                os_log("Error updating info: %s.", type: .error, info)
+            }
         }
     }
     
@@ -609,7 +626,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
      - Parameter withName: The name of the file to create.
      - Returns: A handler for the new file if creation was successful (e.g. permissions).
      */
-    func getTemporaryFile(withName: String) -> FileHandle? {
+    func getLogFile(withName: String = "brewlet.log") -> FileHandle? {
         let homeDir = FileManager.default.homeDirectoryForCurrentUser
         let logDir = homeDir.appendingPathComponent("Library/Logs/Brewlet")
 
