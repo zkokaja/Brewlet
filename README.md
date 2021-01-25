@@ -31,8 +31,7 @@ choose specific packages:
 
 Install with `brew` on the command line:
 ```bash
-brew tap zkokaja/brewlet
-brew install --cask brewlet
+brew install brewlet
 ```
 
 Or download the latest version from 
@@ -43,7 +42,7 @@ or
 You can upgrade to the latest version by running:
 ```bash
 brew update
-brew reinstall brewlet
+brew upgrade brewlet
 ```
 
 ## On the horizon
