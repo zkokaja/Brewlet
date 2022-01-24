@@ -1,10 +1,10 @@
 <h1>
-<img src="images/brewlet-color.svg" alt="BrewLet Icon" width="64px" />
+<img src="images/brewlet-color.svg" alt="Brewlet Icon" width="64px" />
 Brewlet
 </h1>
 
-<a href="https://github.com/zkokaja/Brewlet/releases/tag/v1.4">
-  <img src="images/release-badge.svg" alt="Release Version 1.4"/>
+<a href="https://github.com/zkokaja/Brewlet/releases/latest">
+  <img src="https://img.shields.io/github/release/zkokaja/Brewlet.svg" alt="GitHub Release"/>
 </a>
 
 The missing menulet for [brew.sh].
