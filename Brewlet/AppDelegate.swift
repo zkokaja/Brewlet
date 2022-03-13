@@ -235,8 +235,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
         packageItem.isEnabled = false
         
-        run_command(arguments: ["info", "--json", "--installed"]) { (_, data: Data) in
-            
+        run_command(arguments: ["info", "--json=v2", "--installed"]) { (_, data: Data) in
             // Determine which packages to include
             let includeDependencies = self.userDefaults.bool(forKey: "includeDependencies")
             let criterion: (Package) -> Bool = includeDependencies
