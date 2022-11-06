@@ -23,6 +23,7 @@ class PreferencesController: NSWindowController {
     @IBOutlet weak var shareAnalytics: NSButton!
     @IBOutlet weak var autoUpgrade: NSButton!
     @IBOutlet weak var dontNotifyAvailable: NSButton!
+    @IBOutlet weak var dontUpgradeCasks: NSButton!
     @IBOutlet weak var brewPath: NSTextField!
     @IBOutlet weak var intel: NSButton!
     @IBOutlet weak var appleSilicon: NSButton!
@@ -103,6 +104,11 @@ class PreferencesController: NSWindowController {
         UserDefaults.standard.set(sender.state == .on, forKey: "dontNotify")
     }
     
+    @IBAction func dontUpgradeCasksChanged(_ sender: NSButton) {
+        os_log("Update don't upgrade casks: %s", type: .info, sender.state == .on ? "on" : "off")
+        UserDefaults.standard.set(sender.state == .on, forKey: "dontUpgradeCasks")
+    }
+
     @IBAction func updateIntervalChanged(_ sender: NSSlider) {
         
         var seconds: TimeInterval? = nil
