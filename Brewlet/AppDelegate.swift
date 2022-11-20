@@ -139,11 +139,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
      */
     @IBAction func update_upgrade(sender: NSMenuItem?) {
         let animation = animateIcon()
-
-        var upgrade_command = "upgrade"
-        if self.userDefaults.bool(forKey: "dontUpgradeCasks") {
-            upgrade_command += " --formula"
-        }
         
         // Determine which packages to include
         let includeDependencies = self.userDefaults.bool(forKey: "includeDependencies")
@@ -153,8 +148,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         
         let shouldUpgrade = self.packages.filter(criterion).count > 0
         
-        let command = shouldUpgrade && sender != nil ? upgrade_command : "update"
-        let tmpFile = getLogFile()
+        let command = shouldUpgrade && sender != nil ? "upgrade" : "update"
+        
+        var args = [command]
+        if command == "upgrade" && self.userDefaults.bool(forKey: "dontUpgradeCasks") {
+            args.append("--formula")
+        }
         
         let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
         updateItem.isEnabled = false
@@ -163,8 +162,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
         packageItem.isEnabled = false
         
-        self.run_command(arguments: [command], fileRedirect: tmpFile) { _,_ in
-            os_log("Ran command: `%s`.", type: .info, command)
+        let tmpFile = getLogFile()
+        
+        run_command(arguments: args, fileRedirect: tmpFile) { _,_ in
+            os_log("Ran command: `%s`.", type: .info, args.joined(separator: " "))
             
             updateItem.isEnabled = true
             animation.invalidate()

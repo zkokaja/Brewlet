@@ -69,6 +69,7 @@ class PreferencesController: NSWindowController {
         
         autoUpgrade.state = defaults.bool(forKey: "autoUpgrade") ? .on : .off
         dontNotifyAvailable.state = defaults.bool(forKey: "dontNotify") ? .on : .off
+        dontUpgradeCasks.state = defaults.bool(forKey: "dontUpgradeCasks") ? .on : .off
         
         #if arch(arm64)
         let currentBrewPath = defaults.string(forKey: "brewPath") ?? HomebrewPath.appleSilicon.rawValue
