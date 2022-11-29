@@ -3,62 +3,68 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "brewlet-16.png",
+      "filename" : "AppIcon_16.png",
       "scale" : "1x"
     },
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "brewlet-33.png",
+      "filename" : "AppIcon_16@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "brewlet-32.png",
+      "filename" : "AppIcon_32.png",
       "scale" : "1x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "brewlet-64.png",
+      "filename" : "AppIcon_32@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "brewlet-128.png",
+      "filename" : "AppIcon_128.png",
       "scale" : "1x"
     },
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "brewlet-257.png",
+      "filename" : "AppIcon_128@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "brewlet-256.png",
+      "filename" : "AppIcon_256.png",
       "scale" : "1x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "brewlet-513.png",
+      "filename" : "AppIcon_256@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "brewlet-512.png",
+      "filename" : "AppIcon_512.png",
       "scale" : "1x"
     },
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "brewlet-1024.png",
+      "filename" : "AppIcon_512@2x.png",
       "scale" : "2x"
+    },
+    {
+      "size" : "1024x1024",
+      "idiom" : "mac",
+      "filename" : "AppIcon.png",
+      "scale" : "1x"
     }
   ],
   "info" : {
