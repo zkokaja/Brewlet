@@ -149,17 +149,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         let shouldUpgrade = self.packages.filter(criterion).count > 0
         
         let command = shouldUpgrade && sender != nil ? "upgrade" : "update"
-        let tmpFile = getLogFile()
+        
+        var args = [command]
+        if command == "upgrade" && self.userDefaults.bool(forKey: "dontUpgradeCasks") {
+            args.append("--formula")
+        }
         
         let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
         updateItem.isEnabled = false
-        updateItem.title = command == "upgrade" ? "Upgrading..." : "Updating..."
+        updateItem.title = command == "update" ? "Updating..." : "Upgrading..."
         
         let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
         packageItem.isEnabled = false
         
-        self.run_command(arguments: [command], fileRedirect: tmpFile) { _,_ in
-            os_log("Ran %s command.", type: .info, command)
+        let tmpFile = getLogFile()
+        
+        run_command(arguments: args, fileRedirect: tmpFile) { _,_ in
+            os_log("Ran command: `%s`.", type: .info, args.joined(separator: " "))
             
             updateItem.isEnabled = true
             animation.invalidate()
