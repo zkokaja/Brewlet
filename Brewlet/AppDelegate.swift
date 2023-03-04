@@ -208,7 +208,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             } catch {
                 os_log("Unexpected error: %s", type: .error, error.localizedDescription)
                 self.sendNotification(title: "Unexpected Error",
-                                      body: "An unexpected error occurred. See log for details.")
+                                      body: "An unexpected error occurred during export. See log for details.")
             }
         }
     }
@@ -256,7 +256,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             } catch {
                 os_log("Unexpected error: %s", type: .error, "\(error)")
                 self.sendNotification(title: "Unexpected Error",
-                                      body: "An unexpected error occurred. See log for details.")
+                                      body: "An unexpected error occurred in JSON serialization. See log for details.")
                 return
             }
             
@@ -561,7 +561,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         catch {
             os_log("Unexpected error: %s", type: .error, "\(error)")
             self.sendNotification(title: "Unexpected Error",
-                                  body: "An unexpected error occurred. See log for details.")
+                                  body: "An unexpected error occurred for \(arguments). See log for details.")
         }
     }
     
