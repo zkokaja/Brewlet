@@ -61,10 +61,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
         
         // Run initial tasks to set status
-        sync_services()
-        update_upgrade(sender: nil)
-        update_info()
-        update_analytics()
         setupTimers()
     }
     
@@ -99,6 +95,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             self.update_analytics()
             self.sync_services()
         }
+        timer?.fire()  // Initial start up run
         
         os_log("Scheduled a timer with a period of %f seconds", type: .info, period)
     }
@@ -261,7 +258,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             }
             
             // Update  the GUI
-            var iconName = ""
+//            var iconName = ""
             let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
             let statusItem = self.statusMenu.item(withTag: self.name2tag["outdated"]!)!
             let packageItem = self.statusMenu.item(withTag: self.name2tag["packages"]!)!
@@ -271,7 +268,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             let outdatedPackageCount = outdatedPackages.count
             if outdatedPackageCount > 0 {
                 statusItem.title = "\(outdatedPackageCount) Outdated Packages"
-                iconName = "BrewletIcon-Color"
+//                iconName = "BrewletIcon-Color"
                 updateItem.title = "Upgrade"
                 packageItem.isHidden = false
                 packageItem.isEnabled = true
@@ -287,7 +284,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 }
             } else {
                 statusItem.title = "Packages are up-to-date"
-                iconName = "BrewletIcon-Black"
+//                iconName = "BrewletIcon-Black"
                 updateItem.title = "Update"
                 packageItem.isHidden = true
                 packageItem.isEnabled = false
@@ -298,17 +295,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
             os_log("Checked outdated status.", type: .info)
 
             // Update icon in main thread
-            DispatchQueue.main.async {
-                self.statusItem.button?.image = NSImage(named: iconName)
-                
-                // Upgrade packages if configured to do so
-                let autoUpgrade = self.userDefaults.bool(forKey: "autoUpgrade")
-                if autoUpgrade && outdatedPackageCount > 0 {
-                    os_log("Auto upgrading packages.", type: .info)
-                    let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
-                    self.update_upgrade(sender: updateItem)
-                }
+//            DispatchQueue.main.async {
+//            self.statusItem.button?.image = NSImage(named: iconName)
+            
+            // Upgrade packages if configured to do so
+            let autoUpgrade = self.userDefaults.bool(forKey: "autoUpgrade")
+            if autoUpgrade && outdatedPackageCount > 0 {
+                os_log("Auto upgrading packages.", type: .info)
+                let updateItem = self.statusMenu.item(withTag: self.name2tag["update"]!)!
+                self.update_upgrade(sender: updateItem)
             }
+//            }
         }
     }
     
@@ -367,9 +364,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
                 if n_packages > 1 {
                     statusItem.title = "\(n_packages - 1) Outdated Packages"
                     updateItem.title = "Upgrade"
-                    DispatchQueue.main.async {
-                        self.statusItem.button?.image = NSImage(named: "BrewletIcon-Color")
-                    }
+//                    DispatchQueue.main.async {
+//                        self.statusItem.button?.image = NSImage(named: "BrewletIcon-Color")
+//                    }
                 } else {
                     updateItem.title = "Update"
                     self.check_outdated()
