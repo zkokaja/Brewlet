@@ -25,6 +25,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
     let userDefaults = UserDefaults.standard
     let statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    
     var preferencesWindow: PreferencesController!
     
     struct Service {
@@ -44,7 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         
         // Set the icon
         statusItem.menu = statusMenu
-        statusItem.button?.toolTip = "Brewlet"
+        statusItem.button?.toolTip = "Brewlet \(appVersion ?? "")"
         statusItem.button?.image = NSImage(named: "BrewletIcon-Black")
         statusItem.button?.image?.isTemplate = true
 
@@ -170,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferencesDelegate {
         }
         
         let dateStr = formatDate()
-        statusItem.button?.toolTip = "Brewlet. Last updated \(dateStr)"
+        statusItem.button?.toolTip = "Brewlet \(appVersion ?? ""). Last updated \(dateStr)"
     }
     
     /**
