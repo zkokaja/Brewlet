@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1130"
+   LastUpgradeVersion = "1430"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -17,7 +17,7 @@
                BlueprintIdentifier = "BBC6CAAC23EF476B00189F94"
                BuildableName = "Brewlet.app"
                BlueprintName = "Brewlet"
-               ReferencedContainer = "container:BrewLet.xcodeproj">
+               ReferencedContainer = "container:Brewlet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "BBC6CAAC23EF476B00189F94"
             BuildableName = "Brewlet.app"
             BlueprintName = "Brewlet"
-            ReferencedContainer = "container:BrewLet.xcodeproj">
+            ReferencedContainer = "container:Brewlet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "BBC6CAAC23EF476B00189F94"
             BuildableName = "Brewlet.app"
             BlueprintName = "Brewlet"
-            ReferencedContainer = "container:BrewLet.xcodeproj">
+            ReferencedContainer = "container:Brewlet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
